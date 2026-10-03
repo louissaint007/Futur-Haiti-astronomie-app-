@@ -13,7 +13,7 @@ const copy = {
     selectionHint:'Choisissez une planète sur la scène ou dans la liste.', overview:'Vue complète',
     labels:'Noms des planètes', time:'TEMPS PÉDAGOGIQUE', timeNote:'Mouvements accélérés pour les observer.',
     followOn:'Suivi auto · ON', followOff:'Suivi auto · OFF',
-    cameraViews:'ANGLES DE VUE', viewOrbit:'Orbital', viewTop:'Dessus', viewSide:'Profil', viewClose:'Proche', viewWide:'Panorama',
+    cameraViews:'ANGLES DE VUE', viewOrbit:'Orbital', viewTop:'Dessus', viewSide:'Profil', viewClose:'Proche', viewWide:'Panorama', nextView:'Vue suivante', hideDetails:'Masquer la fiche', showDetails:'Afficher la fiche',
     scaleNote:'Visualisation pédagogique : tailles, distances et vitesses sont adaptées. Les données affichées gardent leurs unités réelles.',
     modePed:'Vue pédagogique', about:'À propos', type:'PLANÈTE', diameter:'DIAMÈTRE', day:'UNE JOURNÉE',
     year:'UNE ANNÉE', temperature:'TEMPÉRATURE', moons:'LUNES CONNUES', more:'Le savais-tu ?',
@@ -53,7 +53,7 @@ const copy = {
     selectionHint:'Chwazi yon planèt sou sèn nan oswa nan lis la.', overview:'Tout sistèm nan',
     labels:'Non planèt yo', time:'TAN POU APRANN', timeNote:'Mouvman yo akselere pou nou ka obsève yo.',
     followOn:'Swivi otomatik · AKTIF', followOff:'Swivi otomatik · KANPE',
-    cameraViews:'ANG DE VI', viewOrbit:'Òbit', viewTop:'Anwo', viewSide:'Kòt', viewClose:'Pre', viewWide:'Lwen',
+    cameraViews:'ANG DE VI', viewOrbit:'Òbit', viewTop:'Anwo', viewSide:'Kòt', viewClose:'Pre', viewWide:'Lwen', nextView:'Pwochen ang', hideDetails:'Kache enfòmasyon yo', showDetails:'Montre enfòmasyon yo',
     scaleNote:'Vizyalizasyon pou aprann: gwosè, distans ak vitès adapte. Done yo kenbe vrè inite yo.',
     modePed:'Vizyalizasyon aprantisaj', about:'Konsènan', type:'KALITE PLANÈT', diameter:'DYAMÈT', day:'YON JOUNEN',
     year:'YON ANE', temperature:'TANPERATI', moons:'LALIN KI KONI', more:'Èske w te konnen?',
@@ -120,6 +120,7 @@ function App() {
   const [followPlanet, setFollowPlanet] = useState(true);
   const [viewId, setViewId] = useState('orbit');
   const [viewRequest, setViewRequest] = useState(0);
+  const [detailsCollapsed, setDetailsCollapsed] = useState(false);
   const [intro, setIntro] = useState(true);
   const [lessonId, setLessonId] = useState(null);
   const [compareId, setCompareId] = useState('jupiter');
@@ -167,6 +168,7 @@ function App() {
   const nameOf = id => names[id] || t.sun;
   const focus = id => {
     setSelectedId(id);
+    setDetailsCollapsed(false);
     setFocusRequest(value => value + 1);
     setLessonId(null);
   };
@@ -178,6 +180,10 @@ function App() {
   const chooseView = id => {
     setViewId(id);
     setViewRequest(value => value + 1);
+  };
+  const cycleView = () => {
+    const views = ['orbit','top','side','close','wide'];
+    chooseView(views[(views.indexOf(viewId) + 1) % views.length]);
   };
   const selectMode = next => {
     setMode(next);
@@ -299,7 +305,7 @@ function App() {
           <div className="sidebar-footnote"><span>i</span><p>{t.scaleNote}</p></div>
         </aside>
 
-        <section className={'stage-column ' + (mode === 'explore' && (selected || selectedId === 'sun') ? 'has-planet-detail' : '')} aria-label={t.explore}>
+        <section className={'stage-column ' + (mode === 'explore' && (selected || selectedId === 'sun') && !detailsCollapsed ? 'has-planet-detail' : '')} aria-label={t.explore}>
           <div className="scene-topline"><span><i className="live-indicator"/>{selected ? nameOf(selected.id).toUpperCase() : selectedId === 'sun' ? t.sun.toUpperCase() : t.overview.toUpperCase()}</span>
             <div className="scene-toggles">
               <button className={'label-toggle ' + (followPlanet ? 'on' : '')} aria-pressed={followPlanet} onClick={() => setFollowPlanet(value => !value)}><i/><span>{followPlanet ? t.followOn : t.followOff}</span></button>
@@ -307,13 +313,10 @@ function App() {
             </div>
           </div>
           <Suspense fallback={<div className="scene-loading"><span>✦</span><strong>Préparation de la scène 3D…</strong></div>}>
-            <SolarScene selectedId={selectedId} onSelect={id => { setSelectedId(id); setFocusRequest(value => value + 1); setLessonId(null); }} timeScale={timeScale} isPaused={isPaused} focusRequest={focusRequest} viewId={viewId} viewRequest={viewRequest} showLabels={showLabels} followPlanet={followPlanet} locale={locale}/>
+            <SolarScene selectedId={selectedId} onSelect={id => { setSelectedId(id); setDetailsCollapsed(false); setFocusRequest(value => value + 1); setLessonId(null); }} timeScale={timeScale} isPaused={isPaused} focusRequest={focusRequest} viewId={viewId} viewRequest={viewRequest} showLabels={showLabels} followPlanet={followPlanet} locale={locale}/>
           </Suspense>
           <div className="camera-view-picker" role="group" aria-label={t.cameraViews}>
-            <span>{t.cameraViews}</span>
-            {[['orbit','◉',t.viewOrbit],['top','↑',t.viewTop],['side','↔',t.viewSide],['close','⊕',t.viewClose],['wide','⤢',t.viewWide]].map(([id,icon,label]) =>
-              <button key={id} className={viewId === id ? 'active' : ''} aria-pressed={viewId === id} onClick={() => chooseView(id)}><i>{icon}</i>{label}</button>
-            )}
+            <button className="camera-next-button" aria-label={t.nextView} title={t.nextView} onClick={cycleView}><i>◉</i><span>{t[({orbit:'viewOrbit',top:'viewTop',side:'viewSide',close:'viewClose',wide:'viewWide'})[viewId]]}</span><b>↻</b></button>
           </div>
           <div className="scene-instructions"><span>◉ {t.drag}</span><i/><span>⌕ {t.zoom}</span><i/><span>{t.gestureTwo}</span></div>
           <div className="scene-bottom">
@@ -325,9 +328,11 @@ function App() {
           </div>
           <div className="scale-legend"><span/> {t.scaleNote}</div>
 
-          {mode === 'explore' && selected && <article className="planet-detail">
+          {mode === 'explore' && selected && <article className={'planet-detail ' + (detailsCollapsed ? 'collapsed' : '')}>
             <button className="detail-close" aria-label={t.close} onClick={overview}>×</button>
+            <button className="detail-collapse" aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? '⌃' : '⌄'}</button>
             <div className="detail-heading"><span className={'detail-planet planet-' + selected.id}/><div><span className="eyebrow">{selected.type[locale].toUpperCase()}</span><h2>{nameOf(selected.id)}</h2></div></div>
+            {!detailsCollapsed && <>
             <div className="detail-orbit">{selected.distanceKm} {t.milKm}<span>·</span>{selected.distanceAu} {t.au}</div>
             <div className="metrics-grid">
               <Metric label={t.diameter} value={selected.diameterKm.toLocaleString('fr-FR')} unit="km"/>
@@ -337,8 +342,9 @@ function App() {
             <div className="detail-fact"><span>✦</span><p>{selected.fact[locale]}</p></div>
             <button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button>
             <div className="detail-footer"><span><small>{t.moons}</small><strong>{moonCount(selected)}</strong>{selected.moonsChanging && <small>{t.moonsAsOf}</small>}</span><button onClick={() => { setMode('compare'); setCompareId(selected.id === 'earth' ? 'jupiter' : selected.id); setCompareReferenceId('earth'); }}>{t.compareEarth} <b>→</b></button></div>
+            </>}
           </article>}
-          {mode === 'explore' && selectedId === 'sun' && <article className="planet-detail sun-detail"><button className="detail-close" onClick={overview}>×</button><div className="detail-heading"><span className="detail-planet planet-sun">☼</span><div><span className="eyebrow">{locale === 'fr' ? 'ÉTOILE' : 'ZETWAL'}</span><h2>{t.sun}</h2></div></div><div className="detail-fact"><span>✦</span><p>{locale === 'fr' ? 'Le Soleil rassemble plus de 99 % de la masse du système solaire et fournit l’énergie qui éclaire les planètes.' : 'Solèy la gen plis pase 99% mas sistèm solè a epi li bay planèt yo limyè ak enèji.'}</p></div><button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button></article>}
+          {mode === 'explore' && selectedId === 'sun' && <article className={'planet-detail sun-detail ' + (detailsCollapsed ? 'collapsed' : '')}><button className="detail-close" onClick={overview}>×</button><button className="detail-collapse" aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? '⌃' : '⌄'}</button><div className="detail-heading"><span className="detail-planet planet-sun">☼</span><div><span className="eyebrow">{locale === 'fr' ? 'ÉTOILE' : 'ZETWAL'}</span><h2>{t.sun}</h2></div></div>{!detailsCollapsed && <><div className="detail-fact"><span>✦</span><p>{locale === 'fr' ? 'Le Soleil rassemble plus de 99 % de la masse du système solaire et fournit l’énergie qui éclaire les planètes.' : 'Solèy la gen plis pase 99% mas sistèm solè a epi li bay planèt yo limyè.'}</p></div><button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button></>}</article>}
           {!selected && !selectedId && !lesson && mode === 'explore' && <div className="welcome-chip"><span>✧</span><div><strong>{t.selection}</strong><small>{t.selectionHint}</small></div><button onClick={() => focus('earth')}>→</button></div>}
           {lesson && <div className="lesson-live-chip"><span>✦</span><div><strong>{t[lesson.title]}</strong><small>{t[lesson.body]}</small></div><button onClick={() => { setLessonId(null); setIsPaused(false); }}>×</button></div>}
         </section>
