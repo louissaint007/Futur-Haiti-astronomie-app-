@@ -25,6 +25,7 @@ Importez ce dépôt GitHub dans Vercel. Vercel détecte Vite automatiquement; ut
 - Choisissez l’un des cinq cadrages rapides : orbital, dessus, profil, proche ou panorama; faites ensuite glisser librement la scène pour continuer à explorer.
 - Sur téléphone, un doigt fait orbiter la caméra; deux doigts font pivoter le point de vue et pincer pour régler le zoom.
 - Sélectionnez une planète dans la scène ou dans le panneau de gauche pour voyager vers elle.
+- Sur téléphone, les modes et les planètes restent accessibles dans une barre compacte; la fiche sélectionnée défile sans masquer la planète en rotation. Le comparateur et les fenêtres d’images gardent leur propre zone de défilement sur les écrans courts.
 - Après sélection, la caméra suit la planète sur son orbite. Le bouton « Suivi auto · ON/OFF » arrête ou reprend le suivi; le glisser-déposer et la molette permettent toujours de modifier manuellement le point de vue.
 - Le panneau pédagogique donne distance moyenne, diamètre, durée du jour et de l’année, température indicative, lunes et fait intéressant.
 - « Apprendre » propose les expériences jour/nuit, saisons, année martienne et tailles comparées.

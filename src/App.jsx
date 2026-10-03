@@ -299,7 +299,7 @@ function App() {
           <div className="sidebar-footnote"><span>i</span><p>{t.scaleNote}</p></div>
         </aside>
 
-        <section className="stage-column" aria-label={t.explore}>
+        <section className={'stage-column ' + (mode === 'explore' && (selected || selectedId === 'sun') ? 'has-planet-detail' : '')} aria-label={t.explore}>
           <div className="scene-topline"><span><i className="live-indicator"/>{selected ? nameOf(selected.id).toUpperCase() : selectedId === 'sun' ? t.sun.toUpperCase() : t.overview.toUpperCase()}</span>
             <div className="scene-toggles">
               <button className={'label-toggle ' + (followPlanet ? 'on' : '')} aria-pressed={followPlanet} onClick={() => setFollowPlanet(value => !value)}><i/><span>{followPlanet ? t.followOn : t.followOff}</span></button>
@@ -325,7 +325,7 @@ function App() {
           </div>
           <div className="scale-legend"><span/> {t.scaleNote}</div>
 
-          {selected && <article className="planet-detail">
+          {mode === 'explore' && selected && <article className="planet-detail">
             <button className="detail-close" aria-label={t.close} onClick={overview}>×</button>
             <div className="detail-heading"><span className={'detail-planet planet-' + selected.id}/><div><span className="eyebrow">{selected.type[locale].toUpperCase()}</span><h2>{nameOf(selected.id)}</h2></div></div>
             <div className="detail-orbit">{selected.distanceKm} {t.milKm}<span>·</span>{selected.distanceAu} {t.au}</div>
@@ -338,7 +338,7 @@ function App() {
             <button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button>
             <div className="detail-footer"><span><small>{t.moons}</small><strong>{moonCount(selected)}</strong>{selected.moonsChanging && <small>{t.moonsAsOf}</small>}</span><button onClick={() => { setMode('compare'); setCompareId(selected.id === 'earth' ? 'jupiter' : selected.id); setCompareReferenceId('earth'); }}>{t.compareEarth} <b>→</b></button></div>
           </article>}
-          {selectedId === 'sun' && <article className="planet-detail sun-detail"><button className="detail-close" onClick={overview}>×</button><div className="detail-heading"><span className="detail-planet planet-sun">☼</span><div><span className="eyebrow">{locale === 'fr' ? 'ÉTOILE' : 'ZETWAL'}</span><h2>{t.sun}</h2></div></div><div className="detail-fact"><span>✦</span><p>{locale === 'fr' ? 'Le Soleil rassemble plus de 99 % de la masse du système solaire et fournit l’énergie qui éclaire les planètes.' : 'Solèy la gen plis pase 99% mas sistèm solè a epi li bay planèt yo limyè ak enèji.'}</p></div><button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button></article>}
+          {mode === 'explore' && selectedId === 'sun' && <article className="planet-detail sun-detail"><button className="detail-close" onClick={overview}>×</button><div className="detail-heading"><span className="detail-planet planet-sun">☼</span><div><span className="eyebrow">{locale === 'fr' ? 'ÉTOILE' : 'ZETWAL'}</span><h2>{t.sun}</h2></div></div><div className="detail-fact"><span>✦</span><p>{locale === 'fr' ? 'Le Soleil rassemble plus de 99 % de la masse du système solaire et fournit l’énergie qui éclaire les planètes.' : 'Solèy la gen plis pase 99% mas sistèm solè a epi li bay planèt yo limyè ak enèji.'}</p></div><button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button></article>}
           {!selected && !selectedId && !lesson && mode === 'explore' && <div className="welcome-chip"><span>✧</span><div><strong>{t.selection}</strong><small>{t.selectionHint}</small></div><button onClick={() => focus('earth')}>→</button></div>}
           {lesson && <div className="lesson-live-chip"><span>✦</span><div><strong>{t[lesson.title]}</strong><small>{t[lesson.body]}</small></div><button onClick={() => { setLessonId(null); setIsPaused(false); }}>×</button></div>}
         </section>
