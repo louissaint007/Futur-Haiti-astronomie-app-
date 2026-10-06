@@ -15,6 +15,18 @@ Ouvrez l’adresse affichée par Vite, généralement `http://localhost:5173`.
 
 Pour préparer les fichiers de production : `npm run build`. Pour tester cette version compilée : `npm run preview`.
 
+## Application Android
+
+Le projet inclut une enveloppe Android Capacitor. Avec Android SDK, Java 17+ et un appareil Android autorisé en débogage USB :
+
+```powershell
+npm install
+npm run android:apk
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Pour actualiser le projet natif après une modification web, relancez `npm run android:sync`. Le projet Android peut aussi être ouvert dans Android Studio depuis le dossier `android/`.
+
 ## Déploiement sur Vercel
 
 Importez ce dépôt GitHub dans Vercel. Vercel détecte Vite automatiquement; utilisez `npm run build` comme commande de compilation et `dist` comme dossier de sortie. Aucun backend ni variable d’environnement n’est requis.

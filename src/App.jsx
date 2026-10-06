@@ -13,7 +13,7 @@ const copy = {
     selectionHint:'Choisissez une planète sur la scène ou dans la liste.', overview:'Vue complète',
     labels:'Noms des planètes', time:'TEMPS PÉDAGOGIQUE', timeNote:'Mouvements accélérés pour les observer.',
     followOn:'Suivi auto · ON', followOff:'Suivi auto · OFF',
-    cameraViews:'ANGLES DE VUE', viewOrbit:'Orbital', viewTop:'Dessus', viewSide:'Profil', viewClose:'Proche', viewWide:'Panorama', nextView:'Vue suivante', hideDetails:'Masquer la fiche', showDetails:'Afficher la fiche',
+    cameraViews:'ANGLES DE VUE', viewOrbit:'Orbital', viewTop:'Dessus', viewSide:'Profil', viewClose:'Proche', viewWide:'Panorama', nextView:'Vue suivante', info:'Info', hideDetails:'Masquer la fiche', showDetails:'Afficher la fiche',
     scaleNote:'Visualisation pédagogique : tailles, distances et vitesses sont adaptées. Les données affichées gardent leurs unités réelles.',
     modePed:'Vue pédagogique', about:'À propos', type:'PLANÈTE', diameter:'DIAMÈTRE', day:'UNE JOURNÉE',
     year:'UNE ANNÉE', temperature:'TEMPÉRATURE', moons:'LUNES CONNUES', more:'Le savais-tu ?',
@@ -53,7 +53,7 @@ const copy = {
     selectionHint:'Chwazi yon planèt sou sèn nan oswa nan lis la.', overview:'Tout sistèm nan',
     labels:'Non planèt yo', time:'TAN POU APRANN', timeNote:'Mouvman yo akselere pou nou ka obsève yo.',
     followOn:'Swivi otomatik · AKTIF', followOff:'Swivi otomatik · KANPE',
-    cameraViews:'ANG DE VI', viewOrbit:'Òbit', viewTop:'Anwo', viewSide:'Kòt', viewClose:'Pre', viewWide:'Lwen', nextView:'Pwochen ang', hideDetails:'Kache enfòmasyon yo', showDetails:'Montre enfòmasyon yo',
+    cameraViews:'ANG DE VI', viewOrbit:'Òbit', viewTop:'Anwo', viewSide:'Kòt', viewClose:'Pre', viewWide:'Lwen', nextView:'Pwochen ang', info:'Enfò', hideDetails:'Kache enfòmasyon yo', showDetails:'Montre enfòmasyon yo',
     scaleNote:'Vizyalizasyon pou aprann: gwosè, distans ak vitès adapte. Done yo kenbe vrè inite yo.',
     modePed:'Vizyalizasyon aprantisaj', about:'Konsènan', type:'KALITE PLANÈT', diameter:'DYAMÈT', day:'YON JOUNEN',
     year:'YON ANE', temperature:'TANPERATI', moons:'LALIN KI KONI', more:'Èske w te konnen?',
@@ -150,6 +150,14 @@ function App() {
     return () => window.clearTimeout(timer);
   }, []);
   useEffect(() => {
+    if (!selectedId) return undefined;
+    const mobile = window.matchMedia('(max-width: 820px)');
+    const syncDetails = () => setDetailsCollapsed(mobile.matches);
+    syncDetails();
+    mobile.addEventListener('change', syncDetails);
+    return () => mobile.removeEventListener('change', syncDetails);
+  }, [selectedId, mode]);
+  useEffect(() => {
     if (!notice) return undefined;
     const timer = window.setTimeout(() => setNotice(''), 2600);
     return () => window.clearTimeout(timer);
@@ -224,7 +232,7 @@ function App() {
         </div>
       </header>
 
-      <main className="explorer-layout">
+      <main className={'explorer-layout ' + (mode === 'compare' ? 'compare-mode' : '')}>
         <aside className="sidebar">
           <div className="side-heading"><span className="eyebrow">{t.navTitle}</span><h1>{t.headline}</h1><p>{t.subhead}</p></div>
           <nav className="mode-tabs" aria-label={t.navTitle}>
@@ -306,7 +314,7 @@ function App() {
         </aside>
 
         <section className={'stage-column ' + (mode === 'explore' && (selected || selectedId === 'sun') && !detailsCollapsed ? 'has-planet-detail' : '')} aria-label={t.explore}>
-          <div className="scene-topline"><span><i className="live-indicator"/>{selected ? nameOf(selected.id).toUpperCase() : selectedId === 'sun' ? t.sun.toUpperCase() : t.overview.toUpperCase()}</span>
+          <div className="scene-topline"><span><i className="live-indicator"/>{selected ? nameOf(selected.id).toUpperCase() : selectedId === 'sun' ? t.sun.toUpperCase() : t.overview.toUpperCase()}{(selected || selectedId === 'sun') && <button className="planet-info-bubble" aria-expanded={!detailsCollapsed} aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{t.info}</button>}</span>
             <div className="scene-toggles">
               <button className={'label-toggle ' + (followPlanet ? 'on' : '')} aria-pressed={followPlanet} onClick={() => setFollowPlanet(value => !value)}><i/><span>{followPlanet ? t.followOn : t.followOff}</span></button>
               <button className={'label-toggle ' + (showLabels ? 'on' : '')} aria-pressed={showLabels} onClick={() => setShowLabels(value => !value)}><i/><span>{t.labels}</span></button>
@@ -330,7 +338,7 @@ function App() {
 
           {mode === 'explore' && selected && <article className={'planet-detail ' + (detailsCollapsed ? 'collapsed' : '')}>
             <button className="detail-close" aria-label={t.close} onClick={overview}>×</button>
-            <button className="detail-collapse" aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? '⌃' : '⌄'}</button>
+            <button className="detail-collapse" aria-expanded={!detailsCollapsed} aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? t.info : '⌄'}</button>
             <div className="detail-heading"><span className={'detail-planet planet-' + selected.id}/><div><span className="eyebrow">{selected.type[locale].toUpperCase()}</span><h2>{nameOf(selected.id)}</h2></div></div>
             {!detailsCollapsed && <>
             <div className="detail-orbit">{selected.distanceKm} {t.milKm}<span>·</span>{selected.distanceAu} {t.au}</div>
@@ -344,7 +352,7 @@ function App() {
             <div className="detail-footer"><span><small>{t.moons}</small><strong>{moonCount(selected)}</strong>{selected.moonsChanging && <small>{t.moonsAsOf}</small>}</span><button onClick={() => { setMode('compare'); setCompareId(selected.id === 'earth' ? 'jupiter' : selected.id); setCompareReferenceId('earth'); }}>{t.compareEarth} <b>→</b></button></div>
             </>}
           </article>}
-          {mode === 'explore' && selectedId === 'sun' && <article className={'planet-detail sun-detail ' + (detailsCollapsed ? 'collapsed' : '')}><button className="detail-close" onClick={overview}>×</button><button className="detail-collapse" aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? '⌃' : '⌄'}</button><div className="detail-heading"><span className="detail-planet planet-sun">☼</span><div><span className="eyebrow">{locale === 'fr' ? 'ÉTOILE' : 'ZETWAL'}</span><h2>{t.sun}</h2></div></div>{!detailsCollapsed && <><div className="detail-fact"><span>✦</span><p>{locale === 'fr' ? 'Le Soleil rassemble plus de 99 % de la masse du système solaire et fournit l’énergie qui éclaire les planètes.' : 'Solèy la gen plis pase 99% mas sistèm solè a epi li bay planèt yo limyè.'}</p></div><button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button></>}</article>}
+          {mode === 'explore' && selectedId === 'sun' && <article className={'planet-detail sun-detail ' + (detailsCollapsed ? 'collapsed' : '')}><button className="detail-close" onClick={overview}>×</button><button className="detail-collapse" aria-expanded={!detailsCollapsed} aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? t.info : '⌄'}</button><div className="detail-heading"><span className="detail-planet planet-sun">☼</span><div><span className="eyebrow">{locale === 'fr' ? 'ÉTOILE' : 'ZETWAL'}</span><h2>{t.sun}</h2></div></div>{!detailsCollapsed && <><div className="detail-fact"><span>✦</span><p>{locale === 'fr' ? 'Le Soleil rassemble plus de 99 % de la masse du système solaire et fournit l’énergie qui éclaire les planètes.' : 'Solèy la gen plis pase 99% mas sistèm solè a epi li bay planèt yo limyè.'}</p></div><button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button></>}</article>}
           {!selected && !selectedId && !lesson && mode === 'explore' && <div className="welcome-chip"><span>✧</span><div><strong>{t.selection}</strong><small>{t.selectionHint}</small></div><button onClick={() => focus('earth')}>→</button></div>}
           {lesson && <div className="lesson-live-chip"><span>✦</span><div><strong>{t[lesson.title]}</strong><small>{t[lesson.body]}</small></div><button onClick={() => { setLessonId(null); setIsPaused(false); }}>×</button></div>}
         </section>
