@@ -93,6 +93,61 @@ function makePlanetTexture(body) {
     }
   }
 
+  if (body.texture === 'earth') {
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 1500; i++) {
+      const x = rand() * canvas.width;
+      const y = rand() * canvas.height;
+      const length = 5 + rand() * 40;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + length * 0.5, y - 2 - rand() * 4, x + length, y + rand() * 3);
+      ctx.strokeStyle = `rgba(235,246,255,${0.035 + rand() * 0.11})`;
+      ctx.lineWidth = 0.7 + rand() * 2.8;
+      ctx.stroke();
+    }
+    ctx.restore();
+  } else if (['jupiter', 'saturn', 'uranus', 'neptune', 'venus'].includes(body.texture)) {
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 14000; i++) {
+      const x = rand() * canvas.width;
+      const y = rand() * canvas.height;
+      const length = 4 + rand() * (body.texture === 'jupiter' ? 66 : 44);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + length, y + (rand() - 0.5) * 2.4);
+      ctx.strokeStyle = rand() > 0.52 ? 'rgba(255,239,207,.12)' : 'rgba(45,35,29,.09)';
+      ctx.lineWidth = 0.45 + rand() * 1.35;
+      ctx.stroke();
+      if (x + length > canvas.width) {
+        ctx.beginPath();
+        ctx.moveTo(x - canvas.width, y);
+        ctx.lineTo(x + length - canvas.width, y + (rand() - 0.5) * 2.4);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  } else {
+    ctx.save();
+    for (let i = 0; i < 900; i++) {
+      const x = rand() * canvas.width;
+      const y = rand() * canvas.height;
+      const radius = 1.5 + rand() * (body.texture === 'mars' ? 8 : 6);
+      const crater = ctx.createRadialGradient(x - radius * 0.3, y - radius * 0.35, radius * 0.12, x, y, radius);
+      crater.addColorStop(0, 'rgba(20,15,13,.34)');
+      crater.addColorStop(0.68, 'rgba(38,27,22,.20)');
+      crater.addColorStop(0.88, 'rgba(238,199,158,.20)');
+      crater.addColorStop(1, 'rgba(25,20,18,0)');
+      ctx.fillStyle = crater;
+      ctx.beginPath();
+      ctx.ellipse(x, y, radius * (0.7 + rand() * 0.6), radius * (0.45 + rand() * 0.4), (rand() - 0.5) * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 4;
@@ -159,12 +214,25 @@ function makeGlowTexture() {
 }
 
 function createSun(scene) {
+  const sunMaterial = new THREE.MeshBasicMaterial({ color: '#fff4dc', toneMapped: false });
   const sun = new THREE.Mesh(
-    new THREE.SphereGeometry(1.62, 48, 48),
-    new THREE.MeshBasicMaterial({ color: '#ffcf76' }),
+    new THREE.SphereGeometry(1.62, 72, 72),
+    sunMaterial,
   );
   sun.userData.bodyId = 'sun';
   scene.add(sun);
+  // Texture illustrative générée pour la scène; l'image SDO de la galerie reste la référence NASA réelle.
+  new THREE.TextureLoader().load('/nasa/sun-photosphere-texture.png', texture => {
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 4;
+    texture.wrapS = THREE.RepeatWrapping;
+    if (sunMaterial.userData.disposed) {
+      texture.dispose();
+      return;
+    }
+    sunMaterial.map = texture;
+    sunMaterial.needsUpdate = true;
+  });
   scene.add(new THREE.Mesh(
     new THREE.SphereGeometry(2.02, 32, 32),
     new THREE.ShaderMaterial({
@@ -204,13 +272,30 @@ function makePlanet(body, scene, onSelect) {
   group.rotation.z = body.id === 'uranus' ? 1.34 : body.id === 'earth' ? 0.41 : 0.03;
   group.userData.bodyId = body.id;
   pivot.add(group);
+  const planetMaterial = new THREE.MeshStandardMaterial({
+    map: makePlanetTexture(body), roughness: body.id === 'earth' ? 0.82 : 0.73,
+    metalness: 0.02, emissive: new THREE.Color(body.color),
+    emissiveIntensity: body.id === 'earth' ? 0.055 : 0.018,
+  });
   const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(body.radius, 40, 40),
-    new THREE.MeshStandardMaterial({
-      map: makePlanetTexture(body), roughness: body.id === 'earth' ? 0.82 : 0.73,
-      metalness: 0.02, emissive: new THREE.Color(body.color), emissiveIntensity: 0.018,
-    }),
+    new THREE.SphereGeometry(body.radius, 64, 48),
+    planetMaterial,
   );
+  if (body.id === 'earth') {
+    new THREE.TextureLoader().load('/nasa/earth-surface-texture.png', texture => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = 8;
+      texture.wrapS = THREE.RepeatWrapping;
+      if (planetMaterial.userData.disposed) {
+        texture.dispose();
+        return;
+      }
+      const previousMap = planetMaterial.map;
+      planetMaterial.map = texture;
+      planetMaterial.needsUpdate = true;
+      previousMap?.dispose();
+    });
+  }
   sphere.userData.bodyId = body.id;
   group.add(sphere);
   const hitArea = new THREE.Mesh(
@@ -444,8 +529,8 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
       controls.dispose();
       scene.traverse(object => {
         object.geometry?.dispose?.();
-        if (Array.isArray(object.material)) object.material.forEach(material => material.dispose());
-        else object.material?.dispose?.();
+        if (Array.isArray(object.material)) object.material.forEach(material => { material.userData.disposed = true; material.dispose(); });
+        else if (object.material) { object.material.userData.disposed = true; object.material.dispose(); }
         object.material?.map?.dispose?.();
       });
       renderer.dispose();

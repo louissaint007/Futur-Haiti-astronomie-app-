@@ -40,20 +40,21 @@ Importez ce dépôt GitHub dans Vercel. Vercel détecte Vite automatiquement; ut
 - Sur téléphone, les modes et les planètes restent accessibles dans une barre compacte; la fiche sélectionnée défile sans masquer la planète en rotation. Le comparateur et les fenêtres d’images gardent leur propre zone de défilement sur les écrans courts.
 - Après sélection, la caméra suit la planète sur son orbite. Le bouton « Suivi auto · ON/OFF » arrête ou reprend le suivi; le glisser-déposer et la molette permettent toujours de modifier manuellement le point de vue.
 - Le panneau pédagogique donne distance moyenne, diamètre, durée du jour et de l’année, température indicative, lunes et fait intéressant.
-- « Apprendre » propose les expériences jour/nuit, saisons, année martienne et tailles comparées.
+- « Apprendre » propose un parcours de repères (Terre → système solaire → Voie lactée → univers observable) et les expériences Soleil-étoile, jour/nuit, saisons, année martienne et tailles comparées.
 - « Comparer » met en regard diamètre, distance au Soleil, masse relative, gravité de surface, durée du jour et de l’année, ainsi qu’une température indicative.
 - Le comparateur propose deux sélecteurs indépendants pour le Soleil et chacune des huit planètes. Les diamètres se calculent depuis les valeurs NASA; le Soleil mesure environ 1 392 000 km, soit 109 fois le diamètre terrestre.
 - La comparaison montre aussi deux sphères côte à côte dont le diamètre suit le rapport réel avec la Terre (les plus petites gardent un minimum visible).
 - Sélectionnez une planète, puis « Images NASA & missions » pour consulter la vue globale du monde (disque entier ou globe presque entier) et, lorsqu’elle est disponible, l’image rapprochée ou de surface déjà présente. Utilisez les onglets « Vue globale » et « Détail / surface » pour passer de l’une à l’autre.
+- Dans la fiche de la Terre, « Manipuler le globe » ouvre un globe séparé et immobile : glisser à la souris ou au doigt le fait tourner, pincer ou utiliser les commandes +/− ajuste le zoom, et le bouton de recentrage restaure la vue initiale. Échap, « Fermer » ou toucher l’arrière-plan ramène à la scène solaire.
 - Les fichiers sont fournis avec le projet pour rester disponibles hors ligne. Certaines images globales sont des mosaïques NASA assemblées à partir de plusieurs captures; leur légende le précise. Les crédits et liens NASA sont associés à chaque image.
-- Le quiz contient trois questions visuelles avec un retour explicatif.
+- Le quiz comprend six questions, dont trois questions de compréhension sur le Soleil comme étoile, la rotation terrestre et les saisons, avec un retour explicatif.
 - Les commandes 1×, 10× et 100× modifient la vitesse de la simulation; Pause arrête les mouvements orbitaux.
 - FR / KREYÒL change l’interface sans rechargement.
 - « Voyager vers Saturne » déclenche un déplacement caméra vers la planète et ses anneaux.
 
 ## Précision scientifique
 
-Les valeurs des huit planètes sont centralisées dans `src/data/planets.js`; la fiche de comparaison du Soleil est dans `src/App.jsx`. Distances et tailles visibles dans la scène 3D sont adaptées pour garder toutes les planètes explorables sur un seul écran; elles ne constituent pas un modèle à l’échelle. Les sphères du comparateur suivent le rapport des diamètres sélectionnés, avec un minimum d’affichage pour garder les petits corps visibles; la ligne de comparaison donne aussi leur rapport numérique. Les vitesses orbitales de la scène sont volontairement accélérées.
+Les valeurs des huit planètes sont centralisées dans `src/data/planets.js`; la fiche de comparaison du Soleil est dans `src/App.jsx`. Distances et tailles visibles dans la scène 3D sont adaptées pour garder toutes les planètes explorables sur un seul écran; elles ne constituent pas un modèle à l’échelle. Les sphères du comparateur suivent le rapport des diamètres sélectionnés, avec un minimum d’affichage pour garder les petits corps visibles; la ligne de comparaison donne aussi leur rapport numérique. Les vitesses orbitales de la scène sont volontairement accélérées. Les textures de surface du Soleil et de la Terre dans la scène sont des illustrations générées pour le rendu 3D, pas des images de mesure ou des cartes géographiques NASA; la galerie conserve séparément les images de référence avec leurs crédits et sources. La texture terrestre ne doit pas servir à localiser précisément des villes, des formations géologiques ou des reliefs.
 
 Les décomptes de lunes signalés comme évolutifs affichent les satellites connus dans les pages NASA consultées en août 2026 : [Jupiter (115)](https://science.nasa.gov/jupiter/jupiter-moons/), [Saturne (293)](https://science.nasa.gov/saturn/moons/), [Uranus (29)](https://science.nasa.gov/uranus/moons/facts/) et [Neptune (16)](https://science.nasa.gov/neptune/moons/). Ces nombres peuvent changer à mesure que de nouveaux satellites sont confirmés.
 

@@ -3,6 +3,7 @@ import { celestialBodies, planetById } from './data/planets.js';
 import { spaceArchive } from './data/spaceArchive.js';
 
 const SolarScene = lazy(() => import('./SolarScene.jsx'));
+const EarthGlobe = lazy(() => import('./EarthGlobe.jsx'));
 
 const copy = {
   fr: {
@@ -19,6 +20,9 @@ const copy = {
     year:'UNE ANNÉE', temperature:'TEMPÉRATURE', moons:'LUNES CONNUES', more:'Le savais-tu ?',
     compareEarth:'Comparer à la Terre', wow:'Voyager vers Saturne', appTag:'EXPLORER · COMPRENDRE · APPRENDRE',
     learnTitle:'Voir pour comprendre', learnIntro:'Choisissez une petite expérience.',
+    learningPathTitle:'Où sommes-nous ?', learningPathCaption:'Le système solaire se trouve dans la Voie lactée.', learningEarth:'Terre', learningSolar:'Système solaire', learningGalaxy:'Voie lactée', learningUniverse:'Univers observable',
+    journeyTitle:'Notre place dans l’espace', journeyIntro:'Un court voyage pour relier la Terre, le Soleil et les planètes.', journeyStart:'Commencer le parcours', journeyStep:'Étape', journeyOf:'sur', journeyNext:'Étape suivante', journeyCheck:'Vérifier mes acquis', journeyRestart:'Recommencer', journeyAddressTitle:'Notre adresse cosmique', journeyAddressBody:'Nous vivons sur la Terre, l’une des huit planètes de notre système solaire. Ce système se trouve dans la galaxie appelée Voie lactée.', journeyStarTitle:'Le Soleil est une étoile', journeyStarBody:'Le Soleil produit sa propre lumière : c’est une étoile. Les autres étoiles nous paraissent petites surtout parce qu’elles sont beaucoup plus lointaines.', journeyOrbitTitle:'Les planètes orbitent autour du Soleil', journeyOrbitBody:'La gravité du Soleil maintient les huit planètes sur leur orbite. Une orbite est le trajet d’un astre autour d’un autre.', journeyScaleTitle:'Comparer les diamètres', journeyScaleBody:'Le diamètre de Jupiter vaut environ 11 fois celui de la Terre. Celui du Soleil vaut environ 109 fois celui de la Terre. Dans la scène, les tailles sont adaptées pour rester visibles.', journeyEarthValue:'Terre · 12 742 km', journeyJupiterValue:'Jupiter · 139 820 km · ≈ 11 Terres', journeySunValue:'Soleil · 1 392 000 km · ≈ 109 Terres',
+    sunIsStar:'Le Soleil est une étoile', sunIsStarSub:'Notre étoile proche éclaire huit planètes.', sunIsStarBody:'Le Soleil est une étoile : une immense sphère de gaz chaud qui produit sa propre lumière. Il nous paraît beaucoup plus grand et lumineux que les autres étoiles parce qu’il est bien plus proche de la Terre. Les huit planètes connues de notre système solaire orbitent autour de lui.',
     dayNight:'Le jour et la nuit', dayNightSub:'La Terre tourne sur elle-même.',
     seasons:'Les saisons', seasonsSub:'L’axe incliné accompagne la Terre autour du Soleil.',
     marsYear:'Une année sur Mars', marsYearSub:'Compare les tours de la Terre et de Mars.',
@@ -34,7 +38,8 @@ const copy = {
     aboutText:'Cette démonstration illustre la vision de Futur Haiti : utiliser les nouvelles technologies pour rendre certains concepts éducatifs plus visuels, interactifs et accessibles.',
     aboutFact:'Prototype éducatif indépendant. Il ne représente pas un programme officiellement adopté par une institution.',
     close:'Fermer', sun:'Soleil', milKm:'millions de km', au:'UA', multiple:'Nombre en évolution', moonNone:'Aucune lune connue', moonKnown:'lune connue', moonsKnown:'lunes déjà connues', countChanging:'Décompte évolutif', moonsAsOf:'Source NASA · août 2026',
-    question:'QUESTION', questionOne:'Quelle planète est la plus grande ?',
+    globeMode:'GLOBE MANIPULABLE', globeTitle:'Explore la Terre', globeSubtitle:'Le globe reste immobile jusqu’à ce que tu le manipules.', globeCanvas:'Globe terrestre interactif et immobile', globeInstructions:'Glisse pour faire tourner le globe · pince ou utilise + et − pour zoomer.', globeControls:'Commandes du globe', globeReset:'Recentrer le globe', zoomIn:'Zoomer davantage', zoomOut:'Dézoomer', openGlobe:'Manipuler le globe', openGlobeSub:'Tourne la Terre et observe-la de près',
+    question:'QUESTION', questionOne:'Quelle planète est la plus grande ?', questionFour:'Le Soleil est…', answerStar:'Une étoile', answerPlanet:'Une planète', answerMoon:'Un satellite naturel', explainStar:'Le Soleil est une étoile parce qu’il produit sa propre lumière. Les planètes, elles, réfléchissent la lumière qu’elles reçoivent.', explainMercury:'Mercure est la planète la plus proche du Soleil. Elle met environ 88 jours terrestres pour en faire le tour.', questionFive:'Qu’est-ce qui provoque l’alternance du jour et de la nuit ?', answerRotation:'La rotation de la Terre sur elle-même', answerRevolution:'La révolution de la Terre autour du Soleil', answerMoonMotion:'Le mouvement de la Lune', explainRotation:'La Terre tourne sur elle-même. La moitié tournée vers le Soleil est éclairée; l’autre est dans la nuit.', questionSix:'Quelle est la cause principale des saisons sur Terre ?', answerTilt:'L’inclinaison de l’axe terrestre', answerDistance:'La distance Terre–Soleil qui change fortement', answerSunHeat:'Le Soleil qui chauffe davantage toute la Terre', explainSeasons:'L’axe terrestre est incliné. Pendant son orbite, les hémisphères reçoivent la lumière solaire avec des angles et des durées différents.', questionSeven:'Comment appelle-t-on le trajet d’une planète autour du Soleil ?', answerOrbit:'Une orbite', explainOrbit:'Une orbite est le trajet d’un astre autour d’un autre. Les huit planètes de notre système solaire orbitent autour du Soleil.',
     questionTwo:'Quelle planète est la plus proche du Soleil ?',
     questionThree:'Quelle planète possède les anneaux les plus visibles ?',
     factSolarSystem:'Huit planètes orbitent autour du Soleil.', intro:'Explorez notre système solaire',
@@ -59,6 +64,9 @@ const copy = {
     year:'YON ANE', temperature:'TANPERATI', moons:'LALIN KI KONI', more:'Èske w te konnen?',
     compareEarth:'Konpare ak Latè', wow:'Vwayaje pou ale Satin', appTag:'EKSPLÒRE · KONPRANN · APRANN',
     learnTitle:'Gade pou w konprann', learnIntro:'Chwazi yon ti eksperyans.',
+    learningPathTitle:'Ki kote nou ye?', learningPathCaption:'Sistèm solè a nan Wout Lakte a.', learningEarth:'Latè', learningSolar:'Sistèm solè a', learningGalaxy:'Wout Lakte', learningUniverse:'Linivè nou ka obsève',
+    journeyTitle:'Kote nou ye nan lespas', journeyIntro:'Yon ti vwayaj pou konekte Latè, Solèy la ak planèt yo.', journeyStart:'Kòmanse vwayaj la', journeyStep:'Etap', journeyOf:'sou', journeyNext:'Etap apre a', journeyCheck:'Verifye sa mwen aprann', journeyRestart:'Rekòmanse', journeyAddressTitle:'Adrès nou nan lespas', journeyAddressBody:'Nou rete sou Latè, youn nan uit planèt sistèm solè nou an. Sistèm sa a nan yon galaksi ki rele Wout Lakte.', journeyStarTitle:'Solèy la se yon etwal', journeyStarBody:'Solèy la pwodui limyè pa li: se yon etwal. Lòt etwal yo parèt piti sitou paske yo pi lwen anpil.', journeyOrbitTitle:'Planèt yo ap fè òbit Solèy la', journeyOrbitBody:'Gravite Solèy la kenbe uit planèt yo sou òbit yo. Òbit se chemen yon ast ki fè wonn yon lòt.', journeyScaleTitle:'Konpare dyamèt yo', journeyScaleBody:'Dyamèt Jipitè anviwon 11 fwa dyamèt Latè. Dyamèt Solèy la anviwon 109 fwa dyamèt Latè. Nan sèn nan, gwosè yo adapte pou yo rete vizib.', journeyEarthValue:'Latè · 12 742 km', journeyJupiterValue:'Jipitè · 139 820 km · ≈ 11 Latè', journeySunValue:'Solèy · 1 392 000 km · ≈ 109 Latè',
+    sunIsStar:'Solèy la se yon etwal', sunIsStarSub:'Etwal ki toupre nou an klere uit planèt.', sunIsStarBody:'Solèy la se yon etwal: yon gwo boul gaz cho ki pwodui limyè pa li. Li sanble pi gwo ak pi klere pase lòt etwal yo paske li pi pre Latè. Uit planèt yo nan sistèm solè nou an ap fè wonn Solèy la.',
     dayNight:'Lajounen ak lannuit', dayNightSub:'Latè ap vire sou tèt li.',
     seasons:'Sezon yo', seasonsSub:'Aks panche a akonpaye Latè bò kote Solèy la.',
     marsYear:'Yon ane sou Mas', marsYearSub:'Konpare tou Latè ak tou Mas.',
@@ -74,7 +82,8 @@ const copy = {
     aboutText:'Demonstrasyon sa a montre vizyon Futur Haiti: sèvi ak nouvo teknoloji pou fè kèk sijè edikatif pi vizyèl, entèaktif ak aksesib.',
     aboutFact:'Pwototip edikatif endepandan. Li pa yon pwogram yon enstitisyon adopte ofisyèlman.',
     close:'Fèmen', sun:'Solèy', milKm:'milyon km', au:'UA', multiple:'Kantite a ap chanje', moonNone:'Pa gen lalin nou konnen', moonKnown:'lalin nou konnen', moonsKnown:'lalin nou deja konnen', countChanging:'Kantite a ap chanje', moonsAsOf:'Sous NASA · out 2026',
-    question:'KESYON', questionOne:'Ki planèt ki pi gwo a?',
+    globeMode:'GLOB KI KA MANIPILE', globeTitle:'Eksplore Latè', globeSubtitle:'Glòb la rete san l pa vire jiskaske ou manyen l.', globeCanvas:'Glòb Latè entèaktif ki pa vire poukont li', globeInstructions:'Trennen pou vire glòb la · peze ak de dwèt oswa itilize + ak − pou rale.', globeControls:'Kontwòl glòb la', globeReset:'Mete glòb la nan mitan ankò', zoomIn:'Rale pi pre', zoomOut:'Rale pi lwen', openGlobe:'Manyen glòb la', openGlobeSub:'Vire Latè epi gade l pi pre',
+    question:'KESYON', questionOne:'Ki planèt ki pi gwo a?', questionFour:'Solèy la se…', answerStar:'Yon etwal', answerPlanet:'Yon planèt', answerMoon:'Yon satelit natirèl', explainStar:'Solèy la se yon etwal paske li pwodui limyè pa li. Planèt yo menm reflete limyè yo resevwa.', explainMercury:'Mèki se planèt ki pi pre Solèy la. Li pran anviwon 88 jou sou Latè pou l fè yon tou.', questionFive:'Ki sa ki fè lajounen ak lannuit chanje?', answerRotation:'Latè k ap vire sou tèt li', answerRevolution:'Latè k ap fè wonn Solèy la', answerMoonMotion:'Mouvman Lalin nan', explainRotation:'Latè ap vire sou tèt li. Mwatye ki bay fas ak Solèy la jwenn limyè; lòt mwatye a nan fènwa.', questionSix:'Ki pi gwo koz sezon yo sou Latè?', answerTilt:'Aks Latè ki panche', answerDistance:'Distans Latè ak Solèy la ki chanje anpil', answerSunHeat:'Solèy la ki chofe tout Latè a plis', explainSeasons:'Aks Latè panche. Pandan Latè ap fè wonn, chak emisfè resevwa limyè Solèy la ak ang ak dire ki diferan.', questionSeven:'Ki non chemen yon planèt fè toutotou Solèy la?', answerOrbit:'Yon òbit', explainOrbit:'Òbit se chemen yon ast fè toutotou yon lòt. Uit planèt ki nan sistèm solè nou an ap fè òbit Solèy la.',
     questionTwo:'Ki planèt ki pi pre Solèy la?', questionThree:'Ki planèt ki gen bag ki pi vizib yo?',
     factSolarSystem:'Uit planèt ap fè wonn Solèy la.', intro:'Eksplore sistèm solè nou an',
     introBy:'Yon eksperyans aprantisaj entèaktif pa Futur Haiti', enter:'Antre nan lespas',
@@ -87,11 +96,22 @@ const copy = {
 };
 
 const quizzes = [
-  { key:'questionOne', correct:'jupiter', options:['earth','jupiter','saturn'] },
-  { key:'questionTwo', correct:'mercury', options:['mercury','venus','mars'] },
-  { key:'questionThree', correct:'saturn', options:['jupiter','saturn','uranus'] },
+  { key:'questionOne', correct:'jupiter', explanation:'lessonSize', options:['earth','jupiter','saturn'] },
+  { key:'questionTwo', correct:'mercury', explanation:'explainMercury', options:['mercury','venus','mars'] },
+  { key:'questionThree', correct:'saturn', explanation:'factSaturn', options:['jupiter','saturn','uranus'] },
+  { key:'questionFour', correct:'star', explanation:'explainStar', options:['star','planet','moon'] },
+  { key:'questionFive', correct:'rotation', explanation:'explainRotation', options:['rotation','revolution','moonMotion'] },
+  { key:'questionSix', correct:'tilt', explanation:'explainSeasons', options:['tilt','distance','sunHeat'] },
+  { key:'questionSeven', correct:'orbit', explanation:'explainOrbit', options:['orbit','rotation','moonMotion'] },
+];
+const guidedJourney = [
+  { title:'journeyAddressTitle', body:'journeyAddressBody', planet:'earth' },
+  { title:'journeyStarTitle', body:'journeyStarBody', planet:'sun' },
+  { title:'journeyOrbitTitle', body:'journeyOrbitBody', planet:'earth' },
+  { title:'journeyScaleTitle', body:'journeyScaleBody', planet:'jupiter' },
 ];
 const lessons = [
+  { id:'star', title:'sunIsStar', subtitle:'sunIsStarSub', body:'sunIsStarBody', planet:'sun', symbol:'☼' },
   { id:'day', title:'dayNight', subtitle:'dayNightSub', body:'lessonDay', planet:'earth', symbol:'◐' },
   { id:'seasons', title:'seasons', subtitle:'seasonsSub', body:'lessonSeason', planet:'earth', symbol:'◒' },
   { id:'mars', title:'marsYear', subtitle:'marsYearSub', body:'lessonMars', planet:'mars', symbol:'↗' },
@@ -123,6 +143,7 @@ function App() {
   const [detailsCollapsed, setDetailsCollapsed] = useState(false);
   const [intro, setIntro] = useState(true);
   const [lessonId, setLessonId] = useState(null);
+  const [journeyStep, setJourneyStep] = useState(-1);
   const [compareId, setCompareId] = useState('jupiter');
   const [compareReferenceId, setCompareReferenceId] = useState('earth');
   const [quizIndex, setQuizIndex] = useState(0);
@@ -130,6 +151,7 @@ function App() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [archiveImageIndex, setArchiveImageIndex] = useState(0);
+  const [earthGlobeOpen, setEarthGlobeOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const t = copy[locale];
   const selected = selectedId && selectedId !== 'sun' ? planetById[selectedId] : null;
@@ -196,11 +218,33 @@ function App() {
   const selectMode = next => {
     setMode(next);
     setLessonId(null);
+    if (next !== 'learn') setJourneyStep(-1);
     if (next === 'quiz') {
       setQuizIndex(0);
       setQuizAnswer(null);
       setIsPaused(true);
     } else if (next !== 'learn') setIsPaused(false);
+  };
+  const startJourney = () => {
+    setJourneyStep(0);
+    focus(guidedJourney[0].planet);
+    setIsPaused(false);
+  };
+  const advanceJourney = () => {
+    if (journeyStep >= guidedJourney.length - 1) {
+      selectMode('quiz');
+      return;
+    }
+    const nextStep = journeyStep + 1;
+    setJourneyStep(nextStep);
+    focus(guidedJourney[nextStep].planet);
+    setIsPaused(false);
+  };
+  const restartJourney = () => {
+    setJourneyStep(-1);
+    setSelectedId(null);
+    setLessonId(null);
+    setFocusRequest(value => value + 1);
   };
   const chooseAnswer = id => {
     if (quizAnswer || !quiz) return;
@@ -214,7 +258,7 @@ function App() {
   const moonCount = body => body.moonsChanging
     ? `${t.countChanging} · ${body.moons} ${t.moonsKnown}`
     : body.moons === 0 ? t.moonNone : `${body.moons} ${body.moons === 1 ? t.moonKnown : (locale === 'fr' ? 'lunes connues' : t.moonsKnown)}`;
-  const localizeQuizName = id => nameOf(id);
+  const localizeQuizName = id => planetById[id]?.name[locale] || t[id === 'star' ? 'answerStar' : id === 'planet' ? 'answerPlanet' : id === 'moon' ? 'answerMoon' : id === 'rotation' ? 'answerRotation' : id === 'revolution' ? 'answerRevolution' : id === 'moonMotion' ? 'answerMoonMotion' : id === 'tilt' ? 'answerTilt' : id === 'distance' ? 'answerDistance' : id === 'orbit' ? 'answerOrbit' : 'answerSunHeat'];
 
   return (
     <div className="app-frame">
@@ -261,7 +305,18 @@ function App() {
           </>}
 
           {mode === 'learn' && <div className="lesson-list-block">
-            <div className="section-caption">{t.guide}<span>04</span></div><p className="side-intro">{t.learnIntro}</p>
+            <div className="section-caption">{t.guide}<span>05</span></div><p className="side-intro">{t.learnIntro}</p>
+            <div className="learning-path"><strong>{t.learningPathTitle}</strong><small>{t.learningPathCaption}</small><div className="learning-path-track"><span className="learning-path-step">{t.learningEarth}</span><span className="learning-path-step">{t.learningSolar}</span><span className="learning-path-step">{t.learningGalaxy}</span><span className="learning-path-step">{t.learningUniverse}</span></div></div>
+            <section className="guided-mission" aria-label={t.journeyTitle}>
+              <div className="guided-mission-kicker"><span>✦</span>{t.journeyTitle}</div>
+              {journeyStep < 0 ? <><p>{t.journeyIntro}</p><button className="guided-primary" onClick={startJourney}>{t.journeyStart} <b>→</b></button></> : <>
+                <div className="guided-progress-label"><span>{t.journeyStep} {journeyStep + 1} {t.journeyOf} {guidedJourney.length}</span><span>{Math.round((journeyStep + 1) / guidedJourney.length * 100)}%</span></div>
+                <div className="guided-progress" role="progressbar" aria-valuemin="0" aria-valuemax={guidedJourney.length} aria-valuenow={journeyStep + 1}><i style={{width:`${(journeyStep + 1) / guidedJourney.length * 100}%`}}/></div>
+                <h2>{t[guidedJourney[journeyStep].title]}</h2><p>{t[guidedJourney[journeyStep].body]}</p>
+                {journeyStep === guidedJourney.length - 1 && <div className="guided-scale-facts"><span>{t.journeyEarthValue}</span><span>{t.journeyJupiterValue}</span><span>{t.journeySunValue}</span></div>}
+                <div className="guided-actions"><button className="guided-reset" onClick={restartJourney}>{t.journeyRestart}</button><button className="guided-primary" onClick={advanceJourney}>{journeyStep === guidedJourney.length - 1 ? t.journeyCheck : t.journeyNext} <b>→</b></button></div>
+              </>}
+            </section>
             {lessons.map(item => <button key={item.id} className={'lesson-card ' + (lessonId === item.id ? 'active' : '')} onClick={() => setLessonId(item.id)}>
               <span className="lesson-symbol">{item.symbol}</span><span><strong>{t[item.title]}</strong><small>{t[item.subtitle]}</small></span><i>↗</i>
             </button>)}
@@ -293,7 +348,7 @@ function App() {
               <div><span>{t.yearCompare}</span><strong>{compare.year[locale]} <i>·</i> {compareReference.year[locale]}</strong></div>
               <div><span>{t.temperatureCompare}</span><strong>{compare.temperature[locale]} <i>·</i> {compareReference.temperature[locale]}</strong></div>
             </div>
-            <button className="outline-button" onClick={() => focus(compare.id === 'sun' ? compareReference.id : compare.id)}>{t.explore} {compare.id === 'sun' ? compareReference.name[locale] : compare.name[locale]} <b>→</b></button>
+            <button className="outline-button" onClick={() => { const worldToExplore = compare.id === 'sun' ? compareReference.id : compare.id; selectMode('explore'); focus(worldToExplore); }}>{t.explore} {compare.id === 'sun' ? compareReference.name[locale] : compare.name[locale]} <b>→</b></button>
           </div>}
 
           {mode === 'quiz' && <div className="quiz-panel">
@@ -304,10 +359,10 @@ function App() {
                 const right = id === quiz.correct;
                 const chosenWrong = id === quizAnswer && !right;
                 return <button key={id} disabled={answered} className={'quiz-option ' + (answered && right ? 'correct ' : '') + (chosenWrong ? 'wrong' : '')} onClick={() => chooseAnswer(id)}>
-                  <span className={'planet-swatch swatch-' + id}><i/></span>{localizeQuizName(id)}{answered && right && <b>✓</b>}{chosenWrong && <b>×</b>}
+                  {planetById[id] ? <span className={'planet-swatch swatch-' + id}><i/></span> : <span className="quiz-symbol">{id === 'star' ? '✦' : id === 'tilt' ? '∠' : '↻'}</span>}{localizeQuizName(id)}{answered && right && <b>✓</b>}{chosenWrong && <b>×</b>}
                 </button>;
               })}</div>
-              {quizAnswer && <div className={'quiz-feedback ' + (quizAnswer === quiz.correct ? 'good' : '')}><strong>{quizAnswer === quiz.correct ? t.correct : t.incorrect}</strong><p>{planetById[quiz.correct].fact[locale]}</p><button onClick={nextQuestion}>{quizIndex + 1 === quizzes.length ? t.quizDone : t.continueQuiz} →</button></div>}
+              {quizAnswer && <div className={'quiz-feedback ' + (quizAnswer === quiz.correct ? 'good' : '')}><strong>{quizAnswer === quiz.correct ? t.correct : t.incorrect}</strong><p>{t[quiz.explanation] || planetById[quiz.correct]?.fact[locale]}</p><button onClick={nextQuestion}>{quizIndex + 1 === quizzes.length ? t.quizDone : t.continueQuiz} →</button></div>}
             </>}
           </div>}
           <div className="sidebar-footnote"><span>i</span><p>{t.scaleNote}</p></div>
@@ -321,7 +376,7 @@ function App() {
             </div>
           </div>
           <Suspense fallback={<div className="scene-loading"><span>✦</span><strong>Préparation de la scène 3D…</strong></div>}>
-            <SolarScene selectedId={selectedId} onSelect={id => { setSelectedId(id); setDetailsCollapsed(false); setFocusRequest(value => value + 1); setLessonId(null); }} timeScale={timeScale} isPaused={isPaused} focusRequest={focusRequest} viewId={viewId} viewRequest={viewRequest} showLabels={showLabels} followPlanet={followPlanet} locale={locale}/>
+            <SolarScene selectedId={selectedId} onSelect={id => { setSelectedId(id); setDetailsCollapsed(false); setFocusRequest(value => value + 1); setLessonId(null); }} timeScale={timeScale} isPaused={isPaused || earthGlobeOpen} focusRequest={focusRequest} viewId={viewId} viewRequest={viewRequest} showLabels={showLabels} followPlanet={followPlanet} locale={locale}/>
           </Suspense>
           <div className="camera-view-picker" role="group" aria-label={t.cameraViews}>
             <button className="camera-next-button" aria-label={t.nextView} title={t.nextView} onClick={cycleView}><i>◉</i><span>{t[({orbit:'viewOrbit',top:'viewTop',side:'viewSide',close:'viewClose',wide:'viewWide'})[viewId]]}</span><b>↻</b></button>
@@ -348,6 +403,7 @@ function App() {
               <Metric label={t.temperature} value={selected.temperature[locale]}/>
             </div>
             <div className="detail-fact"><span>✦</span><p>{selected.fact[locale]}</p></div>
+            {selected.id === 'earth' && <button className="earth-globe-open-button" onClick={() => setEarthGlobeOpen(true)}><span aria-hidden="true">◎</span><span><strong>{t.openGlobe}</strong><small>{t.openGlobeSub}</small></span><b>↗</b></button>}
             <button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button>
             <div className="detail-footer"><span><small>{t.moons}</small><strong>{moonCount(selected)}</strong>{selected.moonsChanging && <small>{t.moonsAsOf}</small>}</span><button onClick={() => { setMode('compare'); setCompareId(selected.id === 'earth' ? 'jupiter' : selected.id); setCompareReferenceId('earth'); }}>{t.compareEarth} <b>→</b></button></div>
             </>}
@@ -378,6 +434,7 @@ function App() {
         </div>
         <a className="archive-source-link" href={archiveImage.source} target="_blank" rel="noreferrer">{t.sourceLink}</a>
       </section></div>}
+      {earthGlobeOpen && <Suspense fallback={<div className="earth-globe-backdrop"><div className="scene-loading"><span>✦</span><strong>{t.globeTitle}</strong></div></div>}><EarthGlobe copy={t} onClose={() => setEarthGlobeOpen(false)}/></Suspense>}
       {notice && <div className="notice-toast">✦ {notice}</div>}
     </div>
   );
