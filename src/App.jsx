@@ -1,5 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { celestialBodies, planetById } from './data/planets.js';
+import { dwarfPlanets, dwarfPlanetById } from './data/dwarfPlanets.js';
+import { majorMoons } from './data/majorMoons.js';
 import { spaceArchive } from './data/spaceArchive.js';
 
 const SolarScene = lazy(() => import('./SolarScene.jsx'));
@@ -9,7 +11,7 @@ const copy = {
   fr: {
     explore:'Explorer', learn:'Apprendre', compare:'Comparer', quiz:'Mini quiz',
     headline:'Le système solaire, à portée de main.', subhead:'Touchez un monde pour vous en approcher.',
-    navTitle:'ESPACE DE DÉCOUVERTE', planets:'SOLEIL + 8 PLANÈTES', guide:'GUIDE D’EXPLORATION',
+    navTitle:'ESPACE DE DÉCOUVERTE', planets:'SOLEIL + 8 PLANÈTES', dwarfExploreTitle:'PLANÈTES NAINES', guide:'GUIDE D’EXPLORATION',
     drag:'Glisser pour tourner', zoom:'Molette pour zoomer', gestureTwo:'2 doigts : tourner / zoomer', selection:'Faites un premier voyage',
     selectionHint:'Choisissez une planète sur la scène ou dans la liste.', overview:'Vue complète',
     labels:'Noms des planètes', time:'TEMPS PÉDAGOGIQUE', timeNote:'Mouvements accélérés pour les observer.',
@@ -21,6 +23,9 @@ const copy = {
     compareEarth:'Comparer à la Terre', wow:'Voyager vers Saturne', appTag:'EXPLORER · COMPRENDRE · APPRENDRE',
     learnTitle:'Voir pour comprendre', learnIntro:'Choisissez une petite expérience.',
     learningPathTitle:'Où sommes-nous ?', learningPathCaption:'Le système solaire se trouve dans la Voie lactée.', learningEarth:'Terre', learningSolar:'Système solaire', learningGalaxy:'Voie lactée', learningUniverse:'Univers observable',
+    moonModelTitle:'Soleil, Terre et Lune', moonModelIntro:'Fais tourner la Lune autour de la Terre et observe comment sa phase apparente change.', moonPhaseLabel:'Position de la Lune', moonPhaseNames:['Nouvelle Lune','Premier croissant','Premier quartier','Lune gibbeuse croissante','Pleine Lune','Lune gibbeuse décroissante','Dernier quartier','Dernier croissant'], moonIllumination:'Partie éclairée visible', moonOrbitFact:'Les phases viennent de la position de la Lune autour de la Terre; la Lune ne produit pas sa propre lumière.', moonEclipseNote:'Une éclipse demande un alignement précis. Comme l’orbite lunaire est inclinée d’environ 5°, il n’y a pas d’éclipse à chaque nouvelle ou pleine Lune.', moonSunLabel:'Lumière du Soleil', moonEarthLabel:'Terre', moonMoonLabel:'Lune', moonScaleNote:'Schéma simplifié : les distances, les tailles et l’inclinaison ne sont pas à l’échelle.',
+    smallWorldsTitle:'Au-delà des huit planètes', smallWorldsIntro:'D’autres corps orbitent autour du Soleil : ils ne sont pas tous des planètes.', dwarfPlanetsHeading:'Planètes naines reconnues', dwarfPlanetsStatus:'5 reconnues par l’UAI', dwarfPlanetsDefinition:'Elles orbitent autour du Soleil et sont presque rondes, mais n’ont pas dégagé leur voisinage orbital comme les huit planètes.', moreCandidates:'D’autres candidates pourraient être reconnues à l’avenir.', smallBodyHeading:'Petits corps : les distinguer', asteroidsLabel:'Astéroïdes', asteroidsFact:'Petits corps rocheux. Beaucoup se trouvent dans la ceinture entre Mars et Jupiter.', cometsLabel:'Comètes', cometsFact:'Corps riches en glaces et poussières; près du Soleil, leur matière peut former une chevelure et une queue.', meteorChainLabel:'Météoroïde → météore → météorite', meteorChainFact:'Un fragment dans l’espace est un météoroïde. La traînée lumineuse dans l’atmosphère est un météore; s’il en reste au sol, c’est une météorite.', scienceSources:'Sources scientifiques ↗',
+    moonWorldsTitle:'Les lunes remarquables des géantes', moonWorldsIntro:'Choisis Jupiter, Uranus ou Neptune; les sphères gardent leur rapport de diamètre.', moonParentJupiter:'Jupiter', moonParentUranus:'Uranus', moonParentNeptune:'Neptune', moonScaleLabel:'Diamètre réel', moonPreviewLabel:'Aperçu agrandi · rapport des tailles conservé', moonWaterLabel:'Eau et glace', moonSources:'NASA · diamètres et mondes océaniques ↗',
     journeyTitle:'Notre place dans l’espace', journeyIntro:'Un court voyage pour relier la Terre, le Soleil et les planètes.', journeyStart:'Commencer le parcours', journeyStep:'Étape', journeyOf:'sur', journeyNext:'Étape suivante', journeyCheck:'Vérifier mes acquis', journeyRestart:'Recommencer', journeyAddressTitle:'Notre adresse cosmique', journeyAddressBody:'Nous vivons sur la Terre, l’une des huit planètes de notre système solaire. Ce système se trouve dans la galaxie appelée Voie lactée.', journeyStarTitle:'Le Soleil est une étoile', journeyStarBody:'Le Soleil produit sa propre lumière : c’est une étoile. Les autres étoiles nous paraissent petites surtout parce qu’elles sont beaucoup plus lointaines.', journeyOrbitTitle:'Les planètes orbitent autour du Soleil', journeyOrbitBody:'La gravité du Soleil maintient les huit planètes sur leur orbite. Une orbite est le trajet d’un astre autour d’un autre.', journeyScaleTitle:'Comparer les diamètres', journeyScaleBody:'Le diamètre de Jupiter vaut environ 11 fois celui de la Terre. Celui du Soleil vaut environ 109 fois celui de la Terre. Dans la scène, les tailles sont adaptées pour rester visibles.', journeyEarthValue:'Terre · 12 742 km', journeyJupiterValue:'Jupiter · 139 820 km · ≈ 11 Terres', journeySunValue:'Soleil · 1 392 000 km · ≈ 109 Terres',
     sunIsStar:'Le Soleil est une étoile', sunIsStarSub:'Notre étoile proche éclaire huit planètes.', sunIsStarBody:'Le Soleil est une étoile : une immense sphère de gaz chaud qui produit sa propre lumière. Il nous paraît beaucoup plus grand et lumineux que les autres étoiles parce qu’il est bien plus proche de la Terre. Les huit planètes connues de notre système solaire orbitent autour de lui.',
     dayNight:'Le jour et la nuit', dayNightSub:'La Terre tourne sur elle-même.',
@@ -53,7 +58,7 @@ const copy = {
   ht: {
     explore:'Eksplore', learn:'Aprann', compare:'Konpare', quiz:'Ti egzamen',
     headline:'Sistèm solè a nan men ou.', subhead:'Chwazi yon planèt pou pwoche bò kote l.',
-    navTitle:'ESPAS DEKOUVÈT', planets:'SOLÈY + 8 PLANÈT YO', guide:'GID EKSPLORASYON',
+    navTitle:'ESPAS DEKOUVÈT', planets:'SOLÈY + 8 PLANÈT YO', dwarfExploreTitle:'PLANÈT NEN YO', guide:'GID EKSPLORASYON',
     drag:'Trennen pou vire', zoom:'Wou sourit pou rale', gestureTwo:'2 dwèt: vire / rale', selection:'Fè premye vwayaj ou',
     selectionHint:'Chwazi yon planèt sou sèn nan oswa nan lis la.', overview:'Tout sistèm nan',
     labels:'Non planèt yo', time:'TAN POU APRANN', timeNote:'Mouvman yo akselere pou nou ka obsève yo.',
@@ -65,6 +70,9 @@ const copy = {
     compareEarth:'Konpare ak Latè', wow:'Vwayaje pou ale Satin', appTag:'EKSPLÒRE · KONPRANN · APRANN',
     learnTitle:'Gade pou w konprann', learnIntro:'Chwazi yon ti eksperyans.',
     learningPathTitle:'Ki kote nou ye?', learningPathCaption:'Sistèm solè a nan Wout Lakte a.', learningEarth:'Latè', learningSolar:'Sistèm solè a', learningGalaxy:'Wout Lakte', learningUniverse:'Linivè nou ka obsève',
+    moonModelTitle:'Solèy, Latè ak Lalin', moonModelIntro:'Fè Lalin nan vire toutotou Latè pou w wè kijan faz li parèt diferan.', moonPhaseLabel:'Pozisyon Lalin nan', moonPhaseNames:['Nouvo Lalin','Premye kwasan','Premye ka','Lalin prèske plen k ap grandi','Plen Lalin','Lalin prèske plen k ap bese','Dènye ka','Dènye kwasan'], moonIllumination:'Pati ki klere nou ka wè', moonOrbitFact:'Faz yo depann de pozisyon Lalin nan toutotou Latè; Lalin nan pa pwodui limyè pa li.', moonEclipseNote:'Eklips mande yon aliyman presi. Òbit Lalin nan panche anviwon 5°, se poutèt sa pa gen eklips chak fwa gen nouvo oswa plen Lalin.', moonSunLabel:'Limyè Solèy la', moonEarthLabel:'Latè', moonMoonLabel:'Lalin', moonScaleNote:'Dyagram senplifye: distans, gwosè ak pant lan pa respekte echèl la.',
+    smallWorldsTitle:'Pi lwen pase uit planèt yo', smallWorldsIntro:'Gen lòt ast k ap vire toutotou Solèy la; se pa tout ki planèt.', dwarfPlanetsHeading:'Planèt nen yo rekonèt', dwarfPlanetsStatus:'Inyon Astwonomik Entènasyonal la rekonèt 5', dwarfPlanetsDefinition:'Yo vire toutotou Solèy la, yo prèske won, men yo poko netwaye zòn òbit yo tankou uit planèt yo.', moreCandidates:'Yo ka rekonèt lòt kandida pi devan.', smallBodyHeading:'Ti kò yo: fè diferans lan', asteroidsLabel:'Astewoyid', asteroidsFact:'Ti kò wòch. Anpil ladan yo nan senti ki ant Mas ak Jipitè.', cometsLabel:'Komèt', cometsFact:'Kò ki gen glas ak pousyè; bò kote Solèy la, materyèl yo ka fòme yon nyaj ak yon ke.', meteorChainLabel:'Meteowoyid → meteyò → meteyorit', meteorChainFact:'Yon ti moso nan lespas se meteowoyid. Tras limyè a nan atmosfè a se meteyò; si gen moso ki rive atè, se meteyorit.', scienceSources:'Sous syantifik ↗',
+    moonWorldsTitle:'Gwo lalin planèt jeyan yo', moonWorldsIntro:'Chwazi Jipitè, Iranis oswa Neptin; esfè yo respekte rapò dyamèt yo.', moonParentJupiter:'Jipitè', moonParentUranus:'Iranis', moonParentNeptune:'Neptin', moonScaleLabel:'Vrè dyamèt', moonPreviewLabel:'Aperçu agrandi · rapò gwosè yo konsève', moonWaterLabel:'Dlo ak glas', moonSources:'NASA · dyamèt ak monn oseyanik ↗',
     journeyTitle:'Kote nou ye nan lespas', journeyIntro:'Yon ti vwayaj pou konekte Latè, Solèy la ak planèt yo.', journeyStart:'Kòmanse vwayaj la', journeyStep:'Etap', journeyOf:'sou', journeyNext:'Etap apre a', journeyCheck:'Verifye sa mwen aprann', journeyRestart:'Rekòmanse', journeyAddressTitle:'Adrès nou nan lespas', journeyAddressBody:'Nou rete sou Latè, youn nan uit planèt sistèm solè nou an. Sistèm sa a nan yon galaksi ki rele Wout Lakte.', journeyStarTitle:'Solèy la se yon etwal', journeyStarBody:'Solèy la pwodui limyè pa li: se yon etwal. Lòt etwal yo parèt piti sitou paske yo pi lwen anpil.', journeyOrbitTitle:'Planèt yo ap fè òbit Solèy la', journeyOrbitBody:'Gravite Solèy la kenbe uit planèt yo sou òbit yo. Òbit se chemen yon ast ki fè wonn yon lòt.', journeyScaleTitle:'Konpare dyamèt yo', journeyScaleBody:'Dyamèt Jipitè anviwon 11 fwa dyamèt Latè. Dyamèt Solèy la anviwon 109 fwa dyamèt Latè. Nan sèn nan, gwosè yo adapte pou yo rete vizib.', journeyEarthValue:'Latè · 12 742 km', journeyJupiterValue:'Jipitè · 139 820 km · ≈ 11 Latè', journeySunValue:'Solèy · 1 392 000 km · ≈ 109 Latè',
     sunIsStar:'Solèy la se yon etwal', sunIsStarSub:'Etwal ki toupre nou an klere uit planèt.', sunIsStarBody:'Solèy la se yon etwal: yon gwo boul gaz cho ki pwodui limyè pa li. Li sanble pi gwo ak pi klere pase lòt etwal yo paske li pi pre Latè. Uit planèt yo nan sistèm solè nou an ap fè wonn Solèy la.',
     dayNight:'Lajounen ak lannuit', dayNightSub:'Latè ap vire sou tèt li.',
@@ -144,6 +152,10 @@ function App() {
   const [intro, setIntro] = useState(true);
   const [lessonId, setLessonId] = useState(null);
   const [journeyStep, setJourneyStep] = useState(-1);
+  const [moonAngle, setMoonAngle] = useState(0);
+  const [dwarfPlanetId, setDwarfPlanetId] = useState('ceres');
+  const [moonParentId, setMoonParentId] = useState('jupiter');
+  const [selectedMoonId, setSelectedMoonId] = useState('europa');
   const [compareId, setCompareId] = useState('jupiter');
   const [compareReferenceId, setCompareReferenceId] = useState('earth');
   const [quizIndex, setQuizIndex] = useState(0);
@@ -154,7 +166,7 @@ function App() {
   const [earthGlobeOpen, setEarthGlobeOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const t = copy[locale];
-  const selected = selectedId && selectedId !== 'sun' ? planetById[selectedId] : null;
+  const selected = selectedId && selectedId !== 'sun' ? (planetById[selectedId] || dwarfPlanetById[selectedId]) : null;
   const lesson = lessons.find(item => item.id === lessonId);
   const compare = comparisonWorlds.find(body => body.id === compareId) || planetById.jupiter;
   const compareReference = comparisonWorlds.find(body => body.id === compareReferenceId) || planetById.earth;
@@ -166,6 +178,14 @@ function App() {
   const archiveImages = archive ? [archive.global, ...(archive.global?.image === archive.image ? [] : [archive])].filter(Boolean) : [];
   const archiveImage = archiveImages[archiveImageIndex] || archiveImages[0];
   const quiz = quizzes[quizIndex];
+  const selectedDwarfPlanet = dwarfPlanetById[dwarfPlanetId] || dwarfPlanets[0];
+  const selectedMoon = majorMoons.find(moon => moon.id === selectedMoonId) || majorMoons[0];
+  const visibleMoons = majorMoons.filter(moon => moon.planet === moonParentId);
+  const moonPhaseIndex = Math.floor((((moonAngle + 22.5) % 360) / 45));
+  const moonIlluminationPercent = Math.round((1 - Math.cos(moonAngle * Math.PI / 180)) * 50);
+  const moonOrbitRadius = 66;
+  const moonOrbitRadians = moonAngle * Math.PI / 180;
+  const moonPosition = { x: 178 - Math.cos(moonOrbitRadians) * moonOrbitRadius, y: 102 + Math.sin(moonOrbitRadians) * moonOrbitRadius };
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIntro(false), 4200);
@@ -194,7 +214,7 @@ function App() {
     return () => window.clearTimeout(timer);
   }, [lessonId]);
 
-  const names = Object.fromEntries(celestialBodies.map(body => [body.id, body.name[locale]]));
+  const names = Object.fromEntries([...celestialBodies, ...dwarfPlanets].map(body => [body.id, body.name[locale]]));
   const nameOf = id => names[id] || t.sun;
   const focus = id => {
     setSelectedId(id);
@@ -297,6 +317,12 @@ function App() {
                   {body.id === 'earth' && <span className="home-tag">{t.home}</span>}<span className="planet-index">{String(index + 1).padStart(2,'0')}</span>
                 </button>)}
               </div>
+              <div className="dwarf-explore-heading">{t.dwarfExploreTitle}</div>
+              <div className="planet-list dwarf-explore-list" role="group" aria-label={t.dwarfPlanetsHeading}>
+                {dwarfPlanets.map(body => <button key={body.id} className={'planet-row ' + (selectedId === body.id ? 'selected' : '')} onClick={() => focus(body.id)}>
+                  <span className="planet-swatch dwarf-swatch" style={{'--dwarf-color':body.color}}><i/></span><span className="planet-row-name">{nameOf(body.id)}</span><span className="planet-kind-tag">{body.diameterKm.toLocaleString(locale === 'fr' ? 'fr-FR' : 'fr-FR')} km</span>
+                </button>)}
+              </div>
             </div>
             <div className="side-actions">
               <button className="secondary-action" onClick={overview}><span>◎</span>{t.overview}<b>↗</b></button>
@@ -307,6 +333,22 @@ function App() {
           {mode === 'learn' && <div className="lesson-list-block">
             <div className="section-caption">{t.guide}<span>05</span></div><p className="side-intro">{t.learnIntro}</p>
             <div className="learning-path"><strong>{t.learningPathTitle}</strong><small>{t.learningPathCaption}</small><div className="learning-path-track"><span className="learning-path-step">{t.learningEarth}</span><span className="learning-path-step">{t.learningSolar}</span><span className="learning-path-step">{t.learningGalaxy}</span><span className="learning-path-step">{t.learningUniverse}</span></div></div>
+            <section className="moon-worlds" aria-labelledby="moon-worlds-title">
+              <div className="moon-worlds-heading"><span>◔</span><div><h2 id="moon-worlds-title">{t.moonWorldsTitle}</h2><p>{t.moonWorldsIntro}</p></div></div>
+              <div className="moon-parent-tabs" role="group" aria-label={t.moonWorldsTitle}>
+                {['jupiter','uranus','neptune'].map((id,index) => <button key={id} className={moonParentId === id ? 'active' : ''} aria-pressed={moonParentId === id} onClick={() => { setMoonParentId(id); setSelectedMoonId(majorMoons.find(moon => moon.planet === id).id); }}>{t[['moonParentJupiter','moonParentUranus','moonParentNeptune'][index]]}</button>)}
+              </div>
+              <div className="moon-size-list" role="group" aria-label={t.moonScaleLabel}>
+                {visibleMoons.map(moon => <button key={moon.id} className={'moon-size-choice ' + (selectedMoonId === moon.id ? 'active' : '')} aria-pressed={selectedMoonId === moon.id} onClick={() => setSelectedMoonId(moon.id)}>
+                  <span className="moon-size-orb" style={{'--moon-ratio':moon.diameterKm / 5268, '--moon-color':moon.color}} aria-hidden="true"/><strong>{moon.name[locale]}</strong><small>{moon.diameterKm.toLocaleString('fr-FR')} km</small>
+                </button>)}
+              </div>
+              <article className="moon-world-detail" aria-live="polite">
+                <span className="moon-preview-orb" style={{'--moon-ratio':selectedMoon.diameterKm / 5268, '--moon-color':selectedMoon.color}} aria-hidden="true"/>
+                <div><span className="eyebrow">{t.moonPreviewLabel}</span><h3>{selectedMoon.name[locale]} · {selectedMoon.diameterKm.toLocaleString('fr-FR')} km</h3><small className="moon-water-status">{selectedMoon.status[locale]}</small><p><strong>{t.moonWaterLabel}:</strong> {selectedMoon.water[locale]}</p></div>
+              </article>
+              <div className="moon-world-sources"><a href="https://ssd.jpl.nasa.gov/sats/phys_par/sep.html" target="_blank" rel="noreferrer">{t.moonSources}</a><a href="https://science.nasa.gov/photojournal/major-moons-of-uranus/" target="_blank" rel="noreferrer">{locale === 'fr' ? 'Modèles des lunes d’Uranus ↗' : 'Modèl lalin Iranis yo ↗'}</a><a href="https://science.nasa.gov/resource/ocean-worlds-triton/" target="_blank" rel="noreferrer">Triton · NASA ↗</a></div>
+            </section>
             <section className="guided-mission" aria-label={t.journeyTitle}>
               <div className="guided-mission-kicker"><span>✦</span>{t.journeyTitle}</div>
               {journeyStep < 0 ? <><p>{t.journeyIntro}</p><button className="guided-primary" onClick={startJourney}>{t.journeyStart} <b>→</b></button></> : <>
@@ -317,6 +359,35 @@ function App() {
                 <div className="guided-actions"><button className="guided-reset" onClick={restartJourney}>{t.journeyRestart}</button><button className="guided-primary" onClick={advanceJourney}>{journeyStep === guidedJourney.length - 1 ? t.journeyCheck : t.journeyNext} <b>→</b></button></div>
               </>}
             </section>
+            <section className="moon-model" aria-labelledby="moon-model-title">
+              <div className="moon-model-heading"><span>☾</span><div><h2 id="moon-model-title">{t.moonModelTitle}</h2><p>{t.moonModelIntro}</p></div></div>
+              <svg className="moon-model-diagram" viewBox="0 0 356 204" role="img" aria-label={`${t.moonSunLabel}, ${t.moonEarthLabel}, ${t.moonMoonLabel}: ${t.moonPhaseNames[moonPhaseIndex]}`}>
+                <defs><radialGradient id="moonModelSun"><stop stopColor="#fff3bd"/><stop offset=".7" stopColor="#ffc34b"/><stop offset="1" stopColor="#ef812f"/></radialGradient><radialGradient id="moonModelEarth"><stop stopColor="#64bce9"/><stop offset=".75" stopColor="#2874bd"/><stop offset="1" stopColor="#152a57"/></radialGradient><marker id="moonModelArrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0 7 3.5 0 7z" fill="#f1c66b"/></marker></defs>
+                <path d="M66 102H132" stroke="#f1c66b" strokeOpacity=".65" strokeDasharray="4 5" markerEnd="url(#moonModelArrow)"/><text x="98" y="91" textAnchor="middle">{t.moonSunLabel}</text>
+                <circle cx="178" cy="102" r="66" fill="none" stroke="#8292b7" strokeOpacity=".38" strokeDasharray="3 5"/>
+                <circle cx="178" cy="102" r="21" fill="url(#moonModelEarth)" stroke="#9edaff" strokeOpacity=".6"/><path d="M163 101q7-13 16-7t16 1M164 108q10-5 15 3t14-1" fill="none" stroke="#75d6aa" strokeOpacity=".65" strokeWidth="3"/>
+                <circle cx={moonPosition.x} cy={moonPosition.y} r="8" fill="#d9d6cb" stroke="#fff4d2" strokeWidth="1.5"/><circle cx={moonPosition.x-2} cy={moonPosition.y-2} r="2" fill="#a5a295" opacity=".6"/><circle cx={moonPosition.x+3} cy={moonPosition.y+2} r="1.5" fill="#99968d" opacity=".55"/>
+                <circle cx="35" cy="102" r="23" fill="url(#moonModelSun)"/><text x="35" y="139" textAnchor="middle">{t.sun}</text><text x="178" y="143" textAnchor="middle">{t.moonEarthLabel}</text><text x={moonPosition.x} y={moonPosition.y+20} textAnchor="middle">{t.moonMoonLabel}</text>
+              </svg>
+              <div className="moon-phase-result"><span className="moon-phase-glyph" aria-hidden="true">{['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'][moonPhaseIndex]}</span><div><strong>{t.moonPhaseNames[moonPhaseIndex]}</strong><small>{t.moonIllumination} · {moonIlluminationPercent}%</small></div></div>
+              <label className="moon-phase-control" htmlFor="moon-phase-slider"><span>{t.moonPhaseLabel}</span><output htmlFor="moon-phase-slider">{moonAngle}°</output><input id="moon-phase-slider" type="range" min="0" max="359" step="1" value={moonAngle} onChange={event => setMoonAngle(Number(event.target.value))} aria-valuetext={`${t.moonPhaseNames[moonPhaseIndex]}, ${moonIlluminationPercent}%`}/></label>
+              <p className="moon-model-fact">{t.moonOrbitFact}</p><p className="moon-eclipse-note">{t.moonEclipseNote}</p><small className="moon-model-scale-note">{t.moonScaleNote}</small>
+            </section>
+            <details className="small-worlds">
+              <summary><span className="small-worlds-mark">✧</span><span><strong>{t.smallWorldsTitle}</strong><small>{t.smallWorldsIntro}</small></span><b>⌄</b></summary>
+              <div className="small-worlds-content">
+                <div className="small-worlds-section-title"><strong>{t.dwarfPlanetsHeading}</strong><span>{t.dwarfPlanetsStatus}</span></div>
+                <p className="small-worlds-definition">{t.dwarfPlanetsDefinition}</p>
+                <div className="dwarf-planet-picker" role="group" aria-label={t.dwarfPlanetsHeading}>
+                  {dwarfPlanets.map(body => <button key={body.id} className={dwarfPlanetId === body.id ? 'active' : ''} aria-pressed={dwarfPlanetId === body.id} onClick={() => { setDwarfPlanetId(body.id); focus(body.id); }}><i style={{'--dwarf-color':body.color}}/>{body.name[locale]}</button>)}
+                </div>
+                <article className="dwarf-planet-fact"><span className="dwarf-planet-orb" style={{'--dwarf-color':selectedDwarfPlanet.color}}/><div><strong>{selectedDwarfPlanet.name[locale]} · {selectedDwarfPlanet.diameterKm.toLocaleString('fr-FR')} km</strong><p>{selectedDwarfPlanet.fact[locale]}</p></div></article>
+                <small className="dwarf-candidate-note">{t.moreCandidates}</small>
+                <div className="small-worlds-section-title small-body-heading"><strong>{t.smallBodyHeading}</strong></div>
+                <div className="small-body-cards"><article><span>◌</span><div><strong>{t.asteroidsLabel}</strong><p>{t.asteroidsFact}</p></div></article><article><span>☄</span><div><strong>{t.cometsLabel}</strong><p>{t.cometsFact}</p></div></article><article><span>✦</span><div><strong>{t.meteorChainLabel}</strong><p>{t.meteorChainFact}</p></div></article></div>
+                <div className="small-worlds-sources"><a href="https://science.nasa.gov/dwarf-planets/" target="_blank" rel="noreferrer">NASA · {t.dwarfPlanetsHeading} ↗</a><a href="https://spaceplace.nasa.gov/asteroid-or-meteor/en/" target="_blank" rel="noreferrer">NASA Space Place · {t.smallBodyHeading} ↗</a></div>
+              </div>
+            </details>
             {lessons.map(item => <button key={item.id} className={'lesson-card ' + (lessonId === item.id ? 'active' : '')} onClick={() => setLessonId(item.id)}>
               <span className="lesson-symbol">{item.symbol}</span><span><strong>{t[item.title]}</strong><small>{t[item.subtitle]}</small></span><i>↗</i>
             </button>)}
@@ -396,16 +467,16 @@ function App() {
             <button className="detail-collapse" aria-expanded={!detailsCollapsed} aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? t.info : '⌄'}</button>
             <div className="detail-heading"><span className={'detail-planet planet-' + selected.id}/><div><span className="eyebrow">{selected.type[locale].toUpperCase()}</span><h2>{nameOf(selected.id)}</h2></div></div>
             {!detailsCollapsed && <>
-            <div className="detail-orbit">{selected.distanceKm} {t.milKm}<span>·</span>{selected.distanceAu} {t.au}</div>
+            <div className="detail-orbit">{selected.distanceKm.toLocaleString('fr-FR')} {t.milKm}<span>·</span>{selected.distanceAu.toLocaleString('fr-FR',{maximumFractionDigits:3})} {t.au}</div>
             <div className="metrics-grid">
               <Metric label={t.diameter} value={selected.diameterKm.toLocaleString('fr-FR')} unit="km"/>
-              <Metric label={t.day} value={selected.day[locale]}/><Metric label={t.year} value={selected.year[locale]}/>
-              <Metric label={t.temperature} value={selected.temperature[locale]}/>
+              {selected.day && <Metric label={t.day} value={selected.day[locale]}/>}<Metric label={t.year} value={selected.year?.[locale] || `${selected.orbitYears} ${locale === 'fr' ? 'ans terrestres' : 'ane sou Latè'}`}/>
+              {selected.temperature && <Metric label={t.temperature} value={selected.temperature[locale]}/>}
             </div>
             <div className="detail-fact"><span>✦</span><p>{selected.fact[locale]}</p></div>
             {selected.id === 'earth' && <button className="earth-globe-open-button" onClick={() => setEarthGlobeOpen(true)}><span aria-hidden="true">◎</span><span><strong>{t.openGlobe}</strong><small>{t.openGlobeSub}</small></span><b>↗</b></button>}
-            <button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button>
-            <div className="detail-footer"><span><small>{t.moons}</small><strong>{moonCount(selected)}</strong>{selected.moonsChanging && <small>{t.moonsAsOf}</small>}</span><button onClick={() => { setMode('compare'); setCompareId(selected.id === 'earth' ? 'jupiter' : selected.id); setCompareReferenceId('earth'); }}>{t.compareEarth} <b>→</b></button></div>
+            {spaceArchive[selected.id] && <button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button>}
+            {!dwarfPlanetById[selected.id] && <div className="detail-footer"><span><small>{t.moons}</small><strong>{moonCount(selected)}</strong>{selected.moonsChanging && <small>{t.moonsAsOf}</small>}</span><button onClick={() => { setMode('compare'); setCompareId(selected.id === 'earth' ? 'jupiter' : selected.id); setCompareReferenceId('earth'); }}>{t.compareEarth} <b>→</b></button></div>}
             </>}
           </article>}
           {mode === 'explore' && selectedId === 'sun' && <article className={'planet-detail sun-detail ' + (detailsCollapsed ? 'collapsed' : '')}><button className="detail-close" onClick={overview}>×</button><button className="detail-collapse" aria-expanded={!detailsCollapsed} aria-label={detailsCollapsed ? t.showDetails : t.hideDetails} title={detailsCollapsed ? t.showDetails : t.hideDetails} onClick={() => setDetailsCollapsed(value => !value)}>{detailsCollapsed ? t.info : '⌄'}</button><div className="detail-heading"><span className="detail-planet planet-sun">☼</span><div><span className="eyebrow">{locale === 'fr' ? 'ÉTOILE' : 'ZETWAL'}</span><h2>{t.sun}</h2></div></div>{!detailsCollapsed && <><div className="detail-fact"><span>✦</span><p>{locale === 'fr' ? 'Le Soleil rassemble plus de 99 % de la masse du système solaire et fournit l’énergie qui éclaire les planètes.' : 'Solèy la gen plis pase 99% mas sistèm solè a epi li bay planèt yo limyè.'}</p></div><button className="archive-open-button" onClick={() => { setArchiveImageIndex(0); setArchiveOpen(true); }}><span>▧</span><span><strong>{t.realImages}</strong><small>{t.realImagesSub}</small></span><b>↗</b></button></>}</article>}

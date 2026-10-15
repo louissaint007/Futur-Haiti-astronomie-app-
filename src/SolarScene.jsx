@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { celestialBodies } from './data/planets.js';
+import { dwarfPlanets } from './data/dwarfPlanets.js';
 
 function random(seed) {
   let value = seed >>> 0;
@@ -401,10 +402,11 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
     scene.add(new THREE.HemisphereLight('#6883bb', '#100e18', 0.22));
     createStarfield(scene);
     createAsteroidBelt(scene);
-    celestialBodies.forEach(body => createOrbit(scene, body.orbit));
+    const allBodies = [...celestialBodies, ...dwarfPlanets];
+    allBodies.forEach(body => createOrbit(scene, body.orbit));
     const sun = createSun(scene);
     const callback = { current: stateRef.current.onSelect };
-    const bodies = celestialBodies.map(body => makePlanet(body, scene, id => callback.current(id)));
+    const bodies = allBodies.map(body => makePlanet(body, scene, id => callback.current(id)));
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     let pointerStart = null;
@@ -461,6 +463,7 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
         const label = group.children.find(child => child.isCSS2DObject)?.element;
         if (label && label.dataset.locale !== current.locale) {
           label.textContent = body.name[current.locale].toUpperCase();
+          label.setAttribute('aria-label', (current.locale === 'fr' ? 'Explorer ' : 'Eksplore ') + body.name[current.locale]);
           label.dataset.locale = current.locale;
         }
       });

@@ -51,6 +51,9 @@ button:focus-visible, select:focus-visible { outline: 2px solid #9bdce9; outline
 .section-caption { display: flex; align-items: center; justify-content: space-between; margin: 0 3px 9px; color: #8290ae; font-size: 8px; font-weight: 700; letter-spacing: 1.2px; }
 .section-caption span { color: #63708c; font-size: 9px; }
 .planet-list { display: grid; gap: 2px; }
+.dwarf-explore-heading { margin:11px 3px 5px; color:#9eabc4; font-size:8px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; }
+.dwarf-swatch { background:radial-gradient(circle at 32% 27%,#fff9,var(--dwarf-color) 45%,#171a24 112%); box-shadow:inset -4px -3px 7px #02040b91,inset 2px 2px 5px #ffffff4d,0 0 9px color-mix(in srgb,var(--dwarf-color),transparent 63%); }
+.planet-kind-tag { margin-left:auto; color:#74819c; font-size:7px; white-space:nowrap; }
 .planet-row { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 37px; padding: 5px 9px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #bdc6da; text-align: left; }
 .planet-row:hover { background: #121a2d; }
 .planet-row.selected { background: linear-gradient(90deg, #1a233a, #141b2d); border-color: #d0b77725; color: #f5dfb3; }
@@ -87,6 +90,48 @@ button:focus-visible, select:focus-visible { outline: 2px solid #9bdce9; outline
 .guided-primary,.guided-reset { min-height:30px; padding:6px 9px; border:1px solid #bda66a45; border-radius:7px; background:#c6a95b18; color:#ecd79e; font-size:8px; font-weight:700; }
 .guided-primary b { margin-left:5px; }
 .guided-reset { border-color:var(--line); background:#ffffff06; color:#9ba7c0; }
+.moon-model { margin:0 0 10px; padding:11px; border:1px solid #527fa82b; border-radius:10px; background:linear-gradient(145deg,#101d30,#101625 75%); }
+.moon-model-heading { display:flex; align-items:flex-start; gap:8px; }
+.moon-model-heading>span { color:#e4d4a8; font-size:18px; line-height:1; }
+.moon-model-heading h2 { margin:0; color:#e3eaf8; font:700 11px/1.3 Manrope,sans-serif; }
+.moon-model-heading p { margin:4px 0 0; color:#93a1ba; font-size:8px; line-height:1.45; }
+.moon-model-diagram { display:block; width:100%; height:auto; max-height:168px; margin:5px auto 2px; overflow:visible; }
+.moon-model-diagram text { fill:#aab7cd; font:7px Inter,Arial,sans-serif; }
+.moon-phase-result { display:flex; align-items:center; gap:9px; padding:7px 8px; border:1px solid #ffffff10; border-radius:7px; background:#ffffff06; }
+.moon-phase-glyph { width:24px; font-size:21px; text-align:center; }
+.moon-phase-result strong,.moon-phase-result small { display:block; }.moon-phase-result strong { color:#e5eaf6; font-size:9px; }.moon-phase-result small { margin-top:3px; color:#98a5bf; font-size:8px; }
+.moon-phase-control { display:grid; grid-template-columns:1fr auto; gap:7px 10px; margin-top:9px; color:#a8b4ca; font-size:8px; }
+.moon-phase-control output { color:#e7cc8c; font-variant-numeric:tabular-nums; }
+.moon-phase-control input { grid-column:1/-1; width:100%; height:15px; margin:0; accent-color:#d9bc72; }
+.moon-model-fact,.moon-eclipse-note { margin:8px 0 0; padding:7px 8px; border-left:2px solid #86a8d159; border-radius:0 5px 5px 0; background:#ffffff06; color:#b4c0d4; font-size:8px; line-height:1.45; }
+.moon-eclipse-note { border-left-color:#d9b96c80; color:#c6bb9d; }
+.moon-model-scale-note { display:block; margin-top:7px; color:#7f8ca6; font-size:7px; line-height:1.4; }
+.small-worlds { margin:0 0 11px; overflow:hidden; border:1px solid #6881a32c; border-radius:9px; background:#111827; }
+.small-worlds>summary { display:grid; grid-template-columns:25px minmax(0,1fr) 14px; align-items:center; gap:8px; padding:10px; cursor:pointer; list-style:none; }
+.small-worlds>summary::-webkit-details-marker { display:none; }.small-worlds>summary:hover { background:#ffffff06; }
+.small-worlds-mark { display:grid; place-items:center; width:24px; height:24px; border:1px solid #d7bd6c30; border-radius:7px; background:#e3c86d10; color:#e5cc8e; font-size:13px; }
+.small-worlds>summary strong,.small-worlds>summary small { display:block; }.small-worlds>summary strong { color:#dce5f5; font-size:9px; }.small-worlds>summary small { margin-top:3px; color:#8d9bb4; font-size:8px; line-height:1.4; }.small-worlds>summary>b { color:#92a0ba; text-align:center; transition:transform .2s; }.small-worlds[open]>summary>b { transform:rotate(180deg); }
+.small-worlds-content { padding:0 10px 10px; }.small-worlds-section-title { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:5px; margin:4px 0 6px; }.small-worlds-section-title strong { color:#e4cb8b; font-size:8px; }.small-worlds-section-title span { color:#8d9bb5; font-size:7px; }
+.small-worlds-definition,.dwarf-planet-fact p,.small-body-cards p { margin:0; color:#a6b2c8; font-size:8px; line-height:1.5; }.small-worlds-definition { margin-bottom:8px; }
+.dwarf-planet-picker { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; }
+.dwarf-planet-picker button { min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:6px 2px; border:1px solid var(--line); border-radius:6px; background:#ffffff04; color:#9eabc2; font-size:7px; }
+.dwarf-planet-picker button.active { border-color:#c9ae665e; background:#c9ae6612; color:#f0d99b; }
+.dwarf-planet-picker i,.dwarf-planet-orb { display:block; width:15px; height:15px; border-radius:50%; background:radial-gradient(circle at 30% 28%,#ffffffb0,var(--dwarf-color) 53%,#171a24 120%); box-shadow:0 0 8px color-mix(in srgb,var(--dwarf-color),transparent 62%); }
+.dwarf-planet-fact { display:flex; align-items:center; gap:8px; margin-top:7px; padding:8px; border:1px solid #ffffff0d; border-radius:7px; background:#ffffff05; }.dwarf-planet-orb { flex:0 0 25px; width:25px; height:25px; }.dwarf-planet-fact strong { display:block; margin-bottom:3px; color:#e3e8f4; font-size:8px; }.dwarf-candidate-note { display:block; margin:6px 0 10px; color:#8896b0; font-size:7px; line-height:1.4; }
+.small-body-heading { justify-content:flex-start; padding-top:7px; border-top:1px solid #ffffff0d; }.small-body-cards { display:grid; gap:5px; }.small-body-cards article { display:grid; grid-template-columns:18px minmax(0,1fr); gap:7px; padding:7px; border:1px solid #ffffff0b; border-radius:6px; background:#ffffff04; }.small-body-cards article>span { color:#d9c27f; font-size:12px; text-align:center; }.small-body-cards strong { display:block; margin-bottom:2px; color:#d5deef; font-size:8px; }
+.small-worlds-sources { display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:8px; }.small-worlds-sources a { color:#92b9e8; font-size:7px; text-decoration:none; }.small-worlds-sources a:hover { text-decoration:underline; }
+.moon-worlds { min-width:0; margin:0 0 10px; padding:11px; border:1px solid #527fa82b; border-radius:10px; background:linear-gradient(145deg,#101d30,#101625 75%); }
+.moon-worlds-heading { display:flex; align-items:flex-start; gap:8px; }.moon-worlds-heading>span { color:#d7cda9; font-size:17px; line-height:1; }.moon-worlds-heading h2 { margin:0; color:#e3eaf8; font:700 11px/1.3 Manrope,sans-serif; }.moon-worlds-heading p { margin:4px 0 0; color:#93a1ba; font-size:8px; line-height:1.45; }
+.moon-parent-tabs { display:flex; gap:5px; margin:10px 0 8px; }.moon-parent-tabs button { flex:1; min-height:28px; padding:5px 7px; border:1px solid var(--line); border-radius:7px; background:#ffffff04; color:#9eabc2; font-size:8px; }.moon-parent-tabs button.active { border-color:#c9ae665e; background:#c9ae6612; color:#f0d99b; }
+.moon-size-list { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px; padding:4px 0 8px; border-bottom:1px solid #ffffff0d; }
+.moon-size-choice { display:flex; min-width:0; min-height:68px; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; padding:5px 2px; border:1px solid transparent; border-radius:7px; background:transparent; color:#aeb9ce; }
+.moon-size-choice:hover,.moon-size-choice.active { border-color:#bca66a39; background:#ffffff07; color:#f0d99b; }
+.moon-size-orb,.moon-preview-orb { display:block; flex:none; width:calc(48px * var(--moon-ratio)); height:calc(48px * var(--moon-ratio)); min-width:3px; min-height:3px; border-radius:50%; background:radial-gradient(circle at 32% 28%,#ffffffc7,var(--moon-color) 39%,#25242a 100%); box-shadow:inset -7px -5px 10px #090b12a8,0 0 9px color-mix(in srgb,var(--moon-color),transparent 63%); }
+.moon-size-choice strong { max-width:100%; overflow:hidden; color:inherit; font-size:7px; text-overflow:ellipsis; white-space:nowrap; }.moon-size-choice small { color:#8491aa; font-size:6px; white-space:nowrap; }
+.moon-world-detail { display:grid; grid-template-columns:120px minmax(0,1fr); align-items:center; gap:11px; min-width:0; margin-top:8px; padding:10px; border:1px solid #ffffff10; border-radius:8px; background:#ffffff05; }
+.moon-preview-orb { width:calc(112px * var(--moon-ratio)); height:calc(112px * var(--moon-ratio)); justify-self:center; box-shadow:inset -12px -9px 17px #090b12a8,0 0 20px color-mix(in srgb,var(--moon-color),transparent 67%); transition:width .25s,height .25s; }
+.moon-world-detail .eyebrow { font-size:6px; letter-spacing:.7px; line-height:1.5; }.moon-world-detail h3 { margin:4px 0; color:#e3eaf8; font:700 11px/1.3 Manrope,sans-serif; }.moon-water-status { display:inline-block; padding:3px 5px; border:1px solid #73b8df30; border-radius:999px; background:#3c83a719; color:#a8d9eb; font-size:7px; }.moon-world-detail p { margin:6px 0 0; color:#a6b2c8; font-size:8px; line-height:1.45; }.moon-world-detail p strong { color:#d4ddec; }
+.moon-world-sources { display:flex; flex-wrap:wrap; gap:6px 11px; margin-top:8px; }.moon-world-sources a { color:#92b9e8; font-size:7px; text-decoration:none; }.moon-world-sources a:hover { text-decoration:underline; }
 .lesson-card { width: 100%; display: grid; grid-template-columns: 35px minmax(0,1fr) 12px; align-items: center; gap: 9px; margin-bottom: 7px; padding: 10px 9px; border: 1px solid var(--line); border-radius: 9px; background: #0d1424; text-align: left; }
 .lesson-card:hover, .lesson-card.active { border-color: #bfa96c65; background: #151c2d; }
 .lesson-symbol { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid #d2b77328; border-radius: 9px; background: #cbb16d10; color: #ecd093; font-size: 16px; }
@@ -253,8 +298,9 @@ button:focus-visible, select:focus-visible { outline: 2px solid #9bdce9; outline
   .side-heading { padding:0 4px 10px; }.side-heading h1 { margin:5px 0 4px; font-size:17px; }.side-heading p { font-size:9px; }
   .mode-tabs { margin-bottom:10px; }.mode-tabs button { display:flex; justify-content:center; font-size:8px; }.nav-symbol { font-size:12px; }
   .planet-list-block { display:grid; grid-template-columns:1fr; }.planet-list { display:flex; overflow-x:auto; gap:5px; padding-bottom:5px; }.planet-row { width:auto; min-width:max-content; min-height:32px; padding:4px 8px; border-color:var(--line); background:#0d1424; }.planet-index,.home-tag { display:none; }
+  .dwarf-explore-heading { margin:4px 2px 3px; font-size:7px; }.dwarf-explore-list { padding-bottom:4px; }
   .side-actions { grid-template-columns:1fr 1fr; margin-top:7px; }.secondary-action { padding:7px 8px; }
-  .sidebar-footnote { display:none; }.lesson-list-block { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }.lesson-list-block>.section-caption,.lesson-list-block>.side-intro,.lesson-list-block>.learning-path,.lesson-list-block>.guided-mission,.lesson-explanation { grid-column:1/-1; }.lesson-card { margin:0; }.lesson-explanation { padding:8px; }
+  .sidebar-footnote { display:none; }.lesson-list-block { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }.lesson-list-block>.section-caption,.lesson-list-block>.side-intro,.lesson-list-block>.learning-path,.lesson-list-block>.guided-mission,.lesson-list-block>.moon-model,.lesson-list-block>.small-worlds,.lesson-list-block>.moon-worlds,.lesson-explanation { grid-column:1/-1; }.lesson-card { margin:0; }.lesson-explanation { padding:8px; }
   .compare-panel,.quiz-panel { padding-bottom:12px; }.stage-column { grid-row:2; min-height:360px; }
   .scene-instructions { left:50%; right:auto; transform:translateX(-50%); top:94px; gap:6px; font-size:7px; }.scene-topline { top:19px; left:18px; right:18px; }.scene-toggles { gap:4px; }.camera-view-picker { top:53px; }.camera-view-picker>span { display:none; }.camera-view-picker button { padding:6px 7px; }
   .planet-info-bubble { display:inline-block; }
@@ -271,6 +317,10 @@ button:focus-visible, select:focus-visible { outline: 2px solid #9bdce9; outline
   .earth-globe-controls button { min-width:32px;height:32px;padding:0 7px; }
   .earth-globe-controls button span { display:none; }
   .brand-mark { width:30px;height:30px; }.brand strong { font-size:10px; }.brand small { font-size:6px; letter-spacing:.7px; }.topbar-actions { gap:6px; }.about-button { padding:7px 8px; font-size:9px; }.language-switch button { padding:5px 6px; font-size:8px; }
+  .dwarf-explore-list { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:3px; overflow:visible; padding-bottom:2px; }
+  .dwarf-explore-list .planet-row { min-width:0; min-height:45px; flex-direction:column; justify-content:center; gap:2px; padding:3px 1px; }
+  .dwarf-explore-list .planet-row .planet-swatch { width:14px; height:14px; }
+  .dwarf-explore-list .planet-row-name { max-width:100%; font-size:7px; text-align:center; white-space:normal; overflow-wrap:anywhere; }
   .explorer-layout { grid-template-rows: 232px minmax(350px,1fr); }.side-heading h1 { max-width:340px; margin:3px 0; font-size:14px; }.side-heading p { display:none; }
   .scene-instructions { top:99px; gap:5px; font-size:6px; }.scene-instructions span:nth-of-type(2),.scene-instructions i:first-of-type { display:none; }.camera-view-picker { top:57px; max-width:calc(100% - 18px); }.camera-view-picker button { gap:3px; padding:6px 6px; font-size:7px; }.camera-view-picker button i { font-size:10px; }.camera-view-picker .camera-next-button { min-width:112px; gap:7px; }.scene-bottom { align-items:flex-end; }.time-control-copy { min-width:80px; }.time-control-copy small { max-width:83px; line-height:1.25; }.overview-button { gap:4px; }.planet-detail { max-height:calc(100% - 130px); overflow:auto; }.metric-card { min-height:46px; padding:7px; }.metric-card strong { font-size:9px; }
   .detail-heading h2 { font-size:20px; }.detail-planet { width:37px;height:37px; }.lesson-live-chip { bottom:105px; }.intro-copy h2 { max-width:90vw; }.intro-copy p { max-width:82vw; margin-inline:auto; font-size:11px; }
@@ -295,8 +345,13 @@ button:focus-visible, select:focus-visible { outline: 2px solid #9bdce9; outline
   .planet-list-block .section-caption { display:none; }
   .planet-list { display:flex; gap:4px; overflow-x:auto; padding:0 0 2px; scrollbar-width:none; }
   .planet-list::-webkit-scrollbar { display:none; }
+  .planet-list.dwarf-explore-list { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:3px; overflow:visible; padding-bottom:2px; }
+  .planet-list.dwarf-explore-list .planet-row { min-width:0; min-height:45px; flex-direction:column; justify-content:center; gap:2px; padding:3px 1px; }
+  .planet-list.dwarf-explore-list .planet-row .planet-swatch { width:14px; height:14px; }
+  .planet-list.dwarf-explore-list .planet-row-name { max-width:100%; font-size:7px; text-align:center; white-space:normal; overflow-wrap:anywhere; }
   .planet-row { flex:0 0 auto; width:auto; min-width:max-content; min-height:30px; gap:5px; padding:4px 6px; border-color:var(--line); background:#0d1424; }
   .planet-row .planet-swatch { width:16px; height:16px; }
+  .planet-kind-tag { display:none; }
   .planet-index,.home-tag { display:none; }
   .stage-column { grid-row:2; min-height:0; }
   .scene-topline { top:8px; left:10px; right:10px; }
