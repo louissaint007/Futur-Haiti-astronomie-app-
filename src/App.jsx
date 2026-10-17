@@ -188,10 +188,6 @@ function App() {
   const moonPosition = { x: 178 - Math.cos(moonOrbitRadians) * moonOrbitRadius, y: 102 + Math.sin(moonOrbitRadians) * moonOrbitRadius };
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIntro(false), 4200);
-    return () => window.clearTimeout(timer);
-  }, []);
-  useEffect(() => {
     if (!selectedId) return undefined;
     const mobile = window.matchMedia('(max-width: 820px)');
     const syncDetails = () => setDetailsCollapsed(mobile.matches);
