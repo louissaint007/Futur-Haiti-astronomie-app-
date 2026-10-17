@@ -23,6 +23,7 @@ const copy = {
     compareEarth:'Comparer à la Terre', wow:'Voyager vers Saturne', appTag:'EXPLORER · COMPRENDRE · APPRENDRE',
     learnTitle:'Voir pour comprendre', learnIntro:'Choisissez une petite expérience.',
     learningPathTitle:'Où sommes-nous ?', learningPathCaption:'Le système solaire se trouve dans la Voie lactée.', learningEarth:'Terre', learningSolar:'Système solaire', learningGalaxy:'Voie lactée', learningUniverse:'Univers observable',
+    starTypesTitle:'Quelques types d’étoiles', starTypesIntro:'Choisis une étoile pour découvrir sa surface et son évolution.', starConcept:'Conception d’artiste · texture illustrative', starPhoto:'Photographie réelle du Soleil', starSunName:'Étoile semblable au Soleil', starSunFact:'Le Soleil est une étoile de type G, dite naine jaune. Sa surface visible, la photosphère, est un plasma chaud qui présente une granulation et des taches solaires.', starRedDwarfName:'Naine rouge', starRedDwarfFact:'Petite et moins chaude que le Soleil, une naine rouge rayonne surtout dans le rouge et l’infrarouge. Les détails colorés de cette vue sont une interprétation artistique, pas une carte de sa surface.', starRedGiantName:'Géante rouge', starRedGiantFact:'En vieillissant, une étoile comme le Soleil se dilate et sa surface se refroidit. De grandes cellules de convection peuvent couvrir une partie importante de cette immense enveloppe.', starBlueName:'Étoile bleue massive', starBlueFact:'Les étoiles bleues massives sont beaucoup plus chaudes et lumineuses que le Soleil, et consomment leur combustible rapidement. Leur surface est représentée ici de façon artistique.',
     moonModelTitle:'Soleil, Terre et Lune', moonModelIntro:'Fais tourner la Lune autour de la Terre et observe comment sa phase apparente change.', moonPhaseLabel:'Position de la Lune', moonPhaseNames:['Nouvelle Lune','Premier croissant','Premier quartier','Lune gibbeuse croissante','Pleine Lune','Lune gibbeuse décroissante','Dernier quartier','Dernier croissant'], moonIllumination:'Partie éclairée visible', moonOrbitFact:'Les phases viennent de la position de la Lune autour de la Terre; la Lune ne produit pas sa propre lumière.', moonEclipseNote:'Une éclipse demande un alignement précis. Comme l’orbite lunaire est inclinée d’environ 5°, il n’y a pas d’éclipse à chaque nouvelle ou pleine Lune.', moonSunLabel:'Lumière du Soleil', moonEarthLabel:'Terre', moonMoonLabel:'Lune', moonScaleNote:'Schéma simplifié : les distances, les tailles et l’inclinaison ne sont pas à l’échelle.',
     smallWorldsTitle:'Au-delà des huit planètes', smallWorldsIntro:'D’autres corps orbitent autour du Soleil : ils ne sont pas tous des planètes.', dwarfPlanetsHeading:'Planètes naines reconnues', dwarfPlanetsStatus:'5 reconnues par l’UAI', dwarfPlanetsDefinition:'Elles orbitent autour du Soleil et sont presque rondes, mais n’ont pas dégagé leur voisinage orbital comme les huit planètes.', moreCandidates:'D’autres candidates pourraient être reconnues à l’avenir.', smallBodyHeading:'Petits corps : les distinguer', asteroidsLabel:'Astéroïdes', asteroidsFact:'Petits corps rocheux. Beaucoup se trouvent dans la ceinture entre Mars et Jupiter.', cometsLabel:'Comètes', cometsFact:'Corps riches en glaces et poussières; près du Soleil, leur matière peut former une chevelure et une queue.', meteorChainLabel:'Météoroïde → météore → météorite', meteorChainFact:'Un fragment dans l’espace est un météoroïde. La traînée lumineuse dans l’atmosphère est un météore; s’il en reste au sol, c’est une météorite.', scienceSources:'Sources scientifiques ↗',
     moonWorldsTitle:'Les lunes remarquables des géantes', moonWorldsIntro:'Choisis Jupiter, Uranus ou Neptune; les sphères gardent leur rapport de diamètre.', moonParentJupiter:'Jupiter', moonParentUranus:'Uranus', moonParentNeptune:'Neptune', moonScaleLabel:'Diamètre réel', moonPreviewLabel:'Aperçu agrandi · rapport des tailles conservé', moonWaterLabel:'Eau et glace', moonSources:'NASA · diamètres et mondes océaniques ↗',
@@ -70,6 +71,7 @@ const copy = {
     compareEarth:'Konpare ak Latè', wow:'Vwayaje pou ale Satin', appTag:'EKSPLÒRE · KONPRANN · APRANN',
     learnTitle:'Gade pou w konprann', learnIntro:'Chwazi yon ti eksperyans.',
     learningPathTitle:'Ki kote nou ye?', learningPathCaption:'Sistèm solè a nan Wout Lakte a.', learningEarth:'Latè', learningSolar:'Sistèm solè a', learningGalaxy:'Wout Lakte', learningUniverse:'Linivè nou ka obsève',
+    starTypesTitle:'Kèk kalite etwal', starTypesIntro:'Chwazi yon etwal pou dekouvri sifas li ak evolisyon li.', starConcept:'Konsepsyon atis · teksti ilistratif', starPhoto:'Vrè foto Solèy la', starSunName:'Etwal ki sanble ak Solèy la', starSunFact:'Solèy la se yon etwal tip G, yo rele tinen jòn. Sifas li nou wè a, fotosfè a, se yon plasma cho ki gen granil ak tach solèy.', starRedDwarfName:'Tinen wouj', starRedDwarfFact:'Yon tinen wouj piti epi li mwens cho pase Solèy la; li bay sitou limyè wouj ak enfrawouj. Ti detay koulè nan imaj sa a se entèpretasyon atistik, se pa yon kat sifas li.', starRedGiantName:'Jeyan wouj', starRedGiantFact:'Lè yon etwal tankou Solèy la ap vyeyi, li vin pi gwo epi sifas li vin pi fre. Gwo selil konveksyon ka kouvri yon bon pati anvlòp jeyan sa a.', starBlueName:'Gwo etwal ble', starBlueFact:'Gwo etwal ble yo pi cho epi pi klere pase Solèy la, epi yo boule gaz yo vit. Imaj sa a montre sifas yo yon fason atistik.',
     moonModelTitle:'Solèy, Latè ak Lalin', moonModelIntro:'Fè Lalin nan vire toutotou Latè pou w wè kijan faz li parèt diferan.', moonPhaseLabel:'Pozisyon Lalin nan', moonPhaseNames:['Nouvo Lalin','Premye kwasan','Premye ka','Lalin prèske plen k ap grandi','Plen Lalin','Lalin prèske plen k ap bese','Dènye ka','Dènye kwasan'], moonIllumination:'Pati ki klere nou ka wè', moonOrbitFact:'Faz yo depann de pozisyon Lalin nan toutotou Latè; Lalin nan pa pwodui limyè pa li.', moonEclipseNote:'Eklips mande yon aliyman presi. Òbit Lalin nan panche anviwon 5°, se poutèt sa pa gen eklips chak fwa gen nouvo oswa plen Lalin.', moonSunLabel:'Limyè Solèy la', moonEarthLabel:'Latè', moonMoonLabel:'Lalin', moonScaleNote:'Dyagram senplifye: distans, gwosè ak pant lan pa respekte echèl la.',
     smallWorldsTitle:'Pi lwen pase uit planèt yo', smallWorldsIntro:'Gen lòt ast k ap vire toutotou Solèy la; se pa tout ki planèt.', dwarfPlanetsHeading:'Planèt nen yo rekonèt', dwarfPlanetsStatus:'Inyon Astwonomik Entènasyonal la rekonèt 5', dwarfPlanetsDefinition:'Yo vire toutotou Solèy la, yo prèske won, men yo poko netwaye zòn òbit yo tankou uit planèt yo.', moreCandidates:'Yo ka rekonèt lòt kandida pi devan.', smallBodyHeading:'Ti kò yo: fè diferans lan', asteroidsLabel:'Astewoyid', asteroidsFact:'Ti kò wòch. Anpil ladan yo nan senti ki ant Mas ak Jipitè.', cometsLabel:'Komèt', cometsFact:'Kò ki gen glas ak pousyè; bò kote Solèy la, materyèl yo ka fòme yon nyaj ak yon ke.', meteorChainLabel:'Meteowoyid → meteyò → meteyorit', meteorChainFact:'Yon ti moso nan lespas se meteowoyid. Tras limyè a nan atmosfè a se meteyò; si gen moso ki rive atè, se meteyorit.', scienceSources:'Sous syantifik ↗',
     moonWorldsTitle:'Gwo lalin planèt jeyan yo', moonWorldsIntro:'Chwazi Jipitè, Iranis oswa Neptin; esfè yo respekte rapò dyamèt yo.', moonParentJupiter:'Jipitè', moonParentUranus:'Iranis', moonParentNeptune:'Neptin', moonScaleLabel:'Vrè dyamèt', moonPreviewLabel:'Aperçu agrandi · rapò gwosè yo konsève', moonWaterLabel:'Dlo ak glas', moonSources:'NASA · dyamèt ak monn oseyanik ↗',
@@ -137,6 +139,13 @@ function Metric({ label, value, unit }) {
   return <div className="metric-card"><span>{label}</span><strong>{value}</strong>{unit && <small>{unit}</small>}</div>;
 }
 
+const starTypes = [
+  { id:'sun', name:'starSunName', fact:'starSunFact', image:'/nasa/sun.jpg', imageClass:'star-image-sun', real:true },
+  { id:'red-dwarf', name:'starRedDwarfName', fact:'starRedDwarfFact', image:'/stars/red-dwarf.svg' },
+  { id:'red-giant', name:'starRedGiantName', fact:'starRedGiantFact', image:'/stars/red-giant.svg' },
+  { id:'blue-massive', name:'starBlueName', fact:'starBlueFact', image:'/stars/blue-massive.svg' },
+];
+
 function App() {
   const [locale, setLocale] = useState('fr');
   const [mode, setMode] = useState('explore');
@@ -151,6 +160,7 @@ function App() {
   const [detailsCollapsed, setDetailsCollapsed] = useState(false);
   const [intro, setIntro] = useState(true);
   const [lessonId, setLessonId] = useState(null);
+  const [starTypeId, setStarTypeId] = useState('sun');
   const [journeyStep, setJourneyStep] = useState(-1);
   const [moonAngle, setMoonAngle] = useState(0);
   const [dwarfPlanetId, setDwarfPlanetId] = useState('ceres');
@@ -389,6 +399,18 @@ function App() {
               <span className="lesson-symbol">{item.symbol}</span><span><strong>{t[item.title]}</strong><small>{t[item.subtitle]}</small></span><i>↗</i>
             </button>)}
             {lesson && <div className="lesson-explanation"><span className="eyebrow">{t.learnTitle}</span><p>{t[lesson.body]}</p><button onClick={() => { setLessonId(null); setIsPaused(false); }}>{t.stopLesson}</button></div>}
+            <section className="star-types" aria-labelledby="star-types-title">
+              <div className="star-types-heading"><span>✦</span><div><h2 id="star-types-title">{t.starTypesTitle}</h2><p>{t.starTypesIntro}</p></div></div>
+              <div className="star-type-picker" role="group" aria-label={t.starTypesTitle}>
+                {starTypes.map(star => <button key={star.id} className={'star-type-choice ' + (starTypeId === star.id ? 'active' : '')} aria-pressed={starTypeId === star.id} onClick={() => setStarTypeId(star.id)}>
+                  <img src={star.image} className={star.imageClass || ''} alt="" loading="lazy"/><span>{t[star.name]}</span>
+                </button>)}
+              </div>
+              {starTypes.filter(star => star.id === starTypeId).map(star => <article className="star-type-detail" key={star.id} aria-live="polite">
+                <div className="star-type-art"><img src={star.image} className={star.imageClass || ''} alt="" loading="lazy"/><span>{star.real ? t.starPhoto : t.starConcept}</span></div>
+                <div><h3>{t[star.name]}</h3><p>{t[star.fact]}</p></div>
+              </article>)}
+            </section>
           </div>}
 
           {mode === 'compare' && <div className="compare-panel">
