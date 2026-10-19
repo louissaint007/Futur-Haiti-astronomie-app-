@@ -25,6 +25,17 @@ export const spaceArchive = {
       {name:'DSCOVR',when:'2015–aujourd’hui',note:{fr:'Observe en continu la face éclairée de la Terre.',ht:'Obsève bò Latè ki klere a san rete.'},url:'https://science.nasa.gov/mission/dscovr/'},
     ]
   },
+  moon: {
+    mission:'Exploration lunaire', source:'https://science.nasa.gov/moon/missions/',
+    missions:[
+      {name:'Luna 2',when:'1959',note:{fr:'Premier objet fabriqué par l’humain à atteindre la surface lunaire.',ht:'Premye objè moun te fabrike ki te rive sou sifas Lalin nan.'},url:'https://science.nasa.gov/moon/exploration/'},
+      {name:'Luna 9',when:'1966',note:{fr:'Premier atterrissage en douceur réussi sur la Lune.',ht:'Premye aterisaj dous ki te reyisi sou Lalin nan.'},url:'https://science.nasa.gov/moon/exploration/'},
+      {name:'Apollo 11',when:'1969',note:{fr:'Neil Armstrong et Buzz Aldrin réalisent les premiers pas humains sur la Lune.',ht:'Neil Armstrong ak Buzz Aldrin fè premye pa moun sou Lalin nan.'},url:'https://www.nasa.gov/mission/apollo-11/'},
+      {name:'Apollo 17',when:'1972',note:{fr:'Dernière mission Apollo à avoir fait marcher des astronautes sur la surface lunaire.',ht:'Dènye misyon Apollo kote astwonòt te mache sou Lalin nan.'},url:'https://science.nasa.gov/mission/apollo-17/'},
+      {name:'Lunar Reconnaissance Orbiter',when:'2009-aujourd’hui',note:{fr:'Cartographie la surface et aide à préparer de futures explorations.',ht:'Li fè kat sifas la epi li ede prepare lòt eksplorasyon.'},url:'https://science.nasa.gov/mission/lunar-reconnaissance-orbiter/'},
+      {name:'Artemis II',when:'2026',note:{fr:'Quatre astronautes ont effectué un survol habité de la Lune et sont revenus sur Terre.',ht:'Kat astwonòt te pase toupre Lalin nan epi yo retounen sou Latè.'},url:'https://science.nasa.gov/moon/exploration/'},
+    ]
+  },
   mars: {
     global:{image:'/nasa/mars-hubble-2016.webp',title:{fr:'Mars vue en entier par Hubble',ht:'Tout Mas jan Hubble te wè l'},date:'12 mai 2016 · vue globale',mission:'Hubble Space Telescope',credit:'NASA / ESA / Hubble Heritage Team / J. Bell / M. Wolff',source:'https://science.nasa.gov/image-detail/hs-2016-15-a-full_tif/'},
     image:'/nasa/mars.jpg', title:{fr:'Panorama du delta du cratère Jezero',ht:'Panorama delta kratè Jezero a'}, date:'2022 · Perseverance / Mastcam-Z', mission:'Hubble & Perseverance', credit:'NASA / JPL-Caltech / ASU / MSSS', source:'https://www.jpl.nasa.gov/images/pia24921-detailed-panorama-of-mars-jezero-crater-delta/',

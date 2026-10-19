@@ -5,6 +5,9 @@ import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer
 import { celestialBodies } from './data/planets.js';
 import { dwarfPlanets } from './data/dwarfPlanets.js';
 
+const MOON_COLOR_MAP = '/nasa/moon-lroc-color-2k.jpg';
+const MOON_ELEVATION_MAP = '/nasa/moon-lola-elevation-1k.jpg';
+
 function random(seed) {
   let value = seed >>> 0;
   return () => {
@@ -19,7 +22,7 @@ function makePlanetTexture(body) {
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
   const rand = random(body.id.split('').reduce((sum, letter) => sum + letter.charCodeAt(0), 7));
-  ctx.fillStyle = body.texture === 'earth' ? '#12659c' : body.color;
+  ctx.fillStyle = body.texture === 'earth' ? '#12659c' : body.texture === 'moon' ? '#aaa9a2' : body.color;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (body.texture === 'earth') {
@@ -274,14 +277,41 @@ function makePlanet(body, scene, onSelect) {
   group.userData.bodyId = body.id;
   pivot.add(group);
   const planetMaterial = new THREE.MeshStandardMaterial({
-    map: makePlanetTexture(body), roughness: body.id === 'earth' ? 0.82 : 0.73,
+    map: body.id === 'moon' ? null : makePlanetTexture(body), roughness: body.id === 'earth' ? 0.82 : 0.73,
     metalness: 0.02, emissive: new THREE.Color(body.color),
     emissiveIntensity: body.id === 'earth' ? 0.055 : 0.018,
   });
   const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(body.radius, 64, 48),
+    new THREE.SphereGeometry(body.radius, body.id === 'moon' ? 160 : 64, body.id === 'moon' ? 120 : 48),
     planetMaterial,
   );
+  if (body.id === 'moon') {
+    new THREE.TextureLoader().load(MOON_COLOR_MAP, texture => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = 4;
+      texture.wrapS = THREE.RepeatWrapping;
+      if (planetMaterial.userData.disposed) {
+        texture.dispose();
+        return;
+      }
+      planetMaterial.map = texture;
+      planetMaterial.color.set('#ffffff');
+      planetMaterial.needsUpdate = true;
+    });
+    new THREE.TextureLoader().load(MOON_ELEVATION_MAP, texture => {
+      texture.anisotropy = 2;
+      texture.wrapS = THREE.RepeatWrapping;
+      if (planetMaterial.userData.disposed) {
+        texture.dispose();
+        return;
+      }
+      // Keep relief in the material shader; vertex displacement on this
+      // scene is unnecessary and needlessly expensive for the small Moon.
+      planetMaterial.bumpMap = texture;
+      planetMaterial.bumpScale = body.radius * 0.055;
+      planetMaterial.needsUpdate = true;
+    });
+  }
   if (body.id === 'earth') {
     new THREE.TextureLoader().load('/nasa/earth-surface-texture.png', texture => {
       texture.colorSpace = THREE.SRGBColorSpace;
@@ -331,14 +361,22 @@ function makePlanet(body, scene, onSelect) {
     ));
     const moonPivot = new THREE.Group();
     group.add(moonPivot);
-    const moon = new THREE.Mesh(
-      new THREE.SphereGeometry(0.105, 18, 18),
-      new THREE.MeshStandardMaterial({ color: '#c8cbd3', roughness: 1 }),
-    );
-    moon.position.set(0.87, 0.1, 0);
-    moon.userData.bodyId = 'earth';
-    moonPivot.add(moon);
+    const moonMaterial = new THREE.MeshStandardMaterial({ roughness:1, metalness:0 });
+    const moon = new THREE.Mesh(new THREE.SphereGeometry(0.105, 32, 24), moonMaterial);
+    new THREE.TextureLoader().load(MOON_COLOR_MAP, texture => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = 4;
+      texture.wrapS = THREE.RepeatWrapping;
+      if (moonMaterial.userData.disposed) { texture.dispose(); return; }
+      moonMaterial.map = texture;
+      moonMaterial.color.set('#ffffff');
+      moonMaterial.needsUpdate = true;
+    });
+    moon.position.set(0.87, 0.1, 0); moon.userData.bodyId = 'moon'; moonPivot.add(moon);
+    const moonHit = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 12), new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    moonHit.position.copy(moon.position); moonHit.userData.bodyId='moon'; moonPivot.add(moonHit);
     group.userData.moonPivot = moonPivot;
+    group.userData.moon = moon;
   }
   const label = document.createElement('button');
   label.className = 'planet-label planet-label-' + body.id;
@@ -352,10 +390,10 @@ function makePlanet(body, scene, onSelect) {
   const labelObject = new CSS2DObject(label);
   labelObject.position.set(0, body.radius * (body.id === 'saturn' ? 2.45 : 1.7), 0);
   group.add(labelObject);
-  return { body, pivot, group, sphere };
+    return { body, pivot, group, sphere, moon:group.userData.moon || null };
 }
 
-export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, focusRequest, viewId = 'orbit', viewRequest = 0, showLabels = true, followPlanet = true, locale = 'fr' }) {
+export default function SolarScene({ selectedId, onSelect, visibleDwarfPlanets = dwarfPlanets, timeScale, isPaused, focusRequest, viewId = 'orbit', viewRequest = 0, showLabels = true, followPlanet = true, locale = 'fr' }) {
   const mountRef = useRef(null);
   const stateRef = useRef({ selectedId, onSelect, timeScale, isPaused, focusRequest, viewId, viewRequest, showLabels, followPlanet, locale });
   stateRef.current = { selectedId, onSelect, timeScale, isPaused, focusRequest, viewId, viewRequest, showLabels, followPlanet, locale };
@@ -379,7 +417,7 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
     controls.enableDamping = true;
     controls.dampingFactor = 0.065;
     controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
-    controls.minDistance = 4;
+    controls.minDistance = 2.1;
     controls.maxDistance = 125;
     controls.maxPolarAngle = Math.PI * 0.49;
     controls.target.set(0, 0, 0);
@@ -402,7 +440,7 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
     scene.add(new THREE.HemisphereLight('#6883bb', '#100e18', 0.22));
     createStarfield(scene);
     createAsteroidBelt(scene);
-    const allBodies = [...celestialBodies, ...dwarfPlanets];
+    const allBodies = [...celestialBodies, ...visibleDwarfPlanets];
     allBodies.forEach(body => createOrbit(scene, body.orbit));
     const sun = createSun(scene);
     const callback = { current: stateRef.current.onSelect };
@@ -410,7 +448,7 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     let pointerStart = null;
-    const selectable = [sun, ...bodies.flatMap(item => item.group.children.filter(child => child.userData.bodyId))];
+    const selectable = [sun, ...bodies.flatMap(item => [...item.group.children.filter(child => child.userData.bodyId), ...(item.moon ? item.group.userData.moonPivot.children : [])])];
     const onDown = event => { pointerStart = [event.clientX, event.clientY]; };
     const onUp = event => {
       if (!pointerStart || Math.hypot(event.clientX - pointerStart[0], event.clientY - pointerStart[1]) > 6) return;
@@ -445,10 +483,19 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
       close: new THREE.Vector3(0.38, 0.31, 1).normalize(),
       wide: new THREE.Vector3(-0.45, 0.52, 1).normalize(),
     };
+    const resolveTarget = id => {
+      if (id === 'moon') {
+        const earth = bodies.find(item => item.body.id === 'earth');
+        return earth ? { ...earth, body: { ...earth.body, id: 'moon', radius: 0.105 }, targetObject: earth.moon } : null;
+      }
+      const item = bodies.find(body => body.body.id === id);
+      return item ? { ...item, targetObject: item.group } : null;
+    };
+    const targetPosition = targetBody => targetBody?.targetObject?.getWorldPosition(new THREE.Vector3()) || new THREE.Vector3(0,0,0);
     const cameraDestination = (targetBody, target, activeView) => {
-      const normalDistance = targetBody ? Math.max(4.7, targetBody.body.radius * 8 + (targetBody.body.id === 'saturn' ? 3.8 : 2.6)) : 86;
+      const normalDistance = targetBody ? (targetBody.body.id === 'moon' ? 3.2 : Math.max(4.7, targetBody.body.radius * 8 + (targetBody.body.id === 'saturn' ? 3.8 : 2.6))) : 86;
       const distance = activeView === 'close'
-        ? targetBody ? Math.max(5.5, targetBody.body.radius * 5 + 2) : 24
+        ? targetBody ? (targetBody.body.id === 'moon' ? 2.35 : Math.max(5.5, targetBody.body.radius * 5 + 2)) : 24
         : activeView === 'wide' ? targetBody ? Math.max(38, normalDistance * 2.1) : 110
           : normalDistance;
       return target.clone().addScaledVector(viewDirections[activeView] || viewDirections.orbit, distance);
@@ -469,21 +516,23 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
       });
       if (current.focusRequest !== lastFocus) {
         lastFocus = current.focusRequest;
-        const targetBody = bodies.find(item => item.body.id === current.selectedId);
+        const targetBody = resolveTarget(current.selectedId);
         followedBodyId = current.followPlanet ? targetBody?.body.id ?? null : null;
         const isSun = current.selectedId === 'sun';
-        const target = targetBody ? targetBody.group.getWorldPosition(new THREE.Vector3()) : new THREE.Vector3(0, 0, 0);
-        tween = {
-          start: performance.now(), duration: targetBody ? 1450 : 1750,
-          fromCamera: camera.position.clone(), toCamera: isSun ? target.clone().addScaledVector(viewDirections[current.viewId] || viewDirections.orbit, 9) : cameraDestination(targetBody, target, current.viewId),
-          fromTarget: controls.target.clone(), toTarget: target,
-        };
+        const target = targetPosition(targetBody);
+        // Selection should feel immediate: place the camera on the selected
+        // body's viewing position in this frame, then track its motion below.
+        camera.position.copy(isSun
+          ? target.clone().addScaledVector(viewDirections[current.viewId] || viewDirections.orbit, 9)
+          : cameraDestination(targetBody, target, current.viewId));
+        controls.target.copy(target);
+        tween = null;
       }
       if (current.viewRequest !== lastViewRequest) {
         lastViewRequest = current.viewRequest;
-        const targetBody = current.followPlanet ? bodies.find(item => item.body.id === current.selectedId) : null;
+        const targetBody = current.followPlanet ? resolveTarget(current.selectedId) : null;
         const target = targetBody
-          ? targetBody.group.getWorldPosition(new THREE.Vector3())
+          ? targetPosition(targetBody)
           : current.followPlanet && current.selectedId === 'sun' ? new THREE.Vector3(0, 0, 0) : controls.target.clone();
         tween = {
           start: performance.now(), duration: 850,
@@ -505,12 +554,12 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
           if (group.userData.moonPivot) group.userData.moonPivot.rotation.y += delta * 0.75 * current.timeScale;
         }
       });
-      const selectedBody = bodies.find(item => item.body.id === current.selectedId);
+      const selectedBody = resolveTarget(current.selectedId);
       followedBodyId = current.followPlanet ? selectedBody?.body.id ?? null : null;
       if (followedBodyId && !tween) {
-        const followed = bodies.find(item => item.body.id === followedBodyId);
+        const followed = resolveTarget(followedBodyId);
         if (followed) {
-          const position = followed.group.getWorldPosition(new THREE.Vector3());
+          const position = targetPosition(followed);
           const shift = position.sub(controls.target);
           camera.position.add(shift);
           controls.target.add(shift);
@@ -532,15 +581,18 @@ export default function SolarScene({ selectedId, onSelect, timeScale, isPaused, 
       controls.dispose();
       scene.traverse(object => {
         object.geometry?.dispose?.();
-        if (Array.isArray(object.material)) object.material.forEach(material => { material.userData.disposed = true; material.dispose(); });
-        else if (object.material) { object.material.userData.disposed = true; object.material.dispose(); }
-        object.material?.map?.dispose?.();
+        const materials = Array.isArray(object.material) ? object.material : object.material ? [object.material] : [];
+        materials.forEach(material => {
+          material.userData.disposed = true;
+          new Set([material.map, material.displacementMap, material.bumpMap]).forEach(texture => texture?.dispose());
+          material.dispose();
+        });
       });
       renderer.dispose();
       renderer.domElement.remove();
       labelRenderer.domElement.remove();
     };
-  }, []);
+  }, [visibleDwarfPlanets.map(body => body.id).join('|')]);
 
   return <div className="solar-scene" ref={mountRef} />;
 }
