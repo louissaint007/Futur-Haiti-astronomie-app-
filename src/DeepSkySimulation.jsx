@@ -128,10 +128,30 @@ function makeStarField(seed = 2901) {
   return { points: new THREE.Points(geometry, material), geometry, material };
 }
 
-function makeBirthCloud(sprite) {
+function getPerformanceProfile() {
+  const mobileViewport = window.matchMedia?.('(max-width: 760px)').matches ?? false;
+  const touchDevice = (window.navigator.maxTouchPoints || 0) > 1;
+  const mobile = mobileViewport || touchDevice;
+  const memory = window.navigator.deviceMemory || 8;
+  const cores = window.navigator.hardwareConcurrency || 4;
+  const constrained = memory <= 4 || cores <= 4;
+
+  return {
+    mobile,
+    birthParticles: constrained ? 6000 : mobile ? 10000 : 36000,
+    supernovaParticles: constrained ? 850 : mobile ? 1400 : 2100,
+    gasParticles: constrained ? 220 : mobile ? 360 : 540,
+    pixelRatio: mobile ? 1 : 1.2,
+    antialias: !mobile,
+    sphereSegments: constrained ? 28 : mobile ? 40 : 72,
+    maxFps: constrained ? 24 : mobile ? 30 : 60,
+  };
+}
+
+function makeBirthCloud(sprite, count = 36000) {
   const random = makeSeededRandom(8317);
-  // Keep the molecular cloud visibly full even at the widest camera distance.
-  const count = 36000;
+  // Keep a dense cloud on phones while avoiding an excessive per-frame particle workload.
+
   const positions = new Float32Array(count * 3);
   const cloud = new Float32Array(count * 3);
   const target = new Float32Array(count * 3);
@@ -297,9 +317,10 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return undefined;
+    const quality = getPerformanceProfile();
     let renderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
+      renderer = new THREE.WebGLRenderer({ antialias: quality.antialias, alpha: true, stencil: false, powerPreference: 'low-power' });
     } catch {
       const fallback = document.createElement('p');
       fallback.className = 'deep-sky-simulation-error';
@@ -323,7 +344,7 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
     controls.maxDistance = scenario === 'formation' ? 22 : 12;
     controls.touches.ONE = THREE.TOUCH.ROTATE;
     controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, quality.pixelRatio));
     renderer.setSize(Math.max(mount.clientWidth, 1), Math.max(mount.clientHeight, 1), false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
@@ -335,13 +356,13 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
     const starField = makeStarField();
     scene.add(starField.points);
     const sprite = makeParticleSprite();
-    const starGeometry = new THREE.SphereGeometry(1, 72, 48);
+    const starGeometry = new THREE.SphereGeometry(1, quality.sphereSegments, Math.max(20, Math.round(quality.sphereSegments * 2 / 3)));
     const starMaterial = new THREE.MeshBasicMaterial({ color: scenario === 'formation' ? '#ffe6a8' : '#92bfff', toneMapped: false });
     const star = new THREE.Mesh(starGeometry, starMaterial);
     scene.add(star);
-    const glow = new THREE.Mesh(new THREE.SphereGeometry(1.17, 48, 32), makeGlowMaterial(config.color, 0.18));
+    const glow = new THREE.Mesh(new THREE.SphereGeometry(1.17, quality.sphereSegments, Math.max(20, Math.round(quality.sphereSegments * 2 / 3))), makeGlowMaterial(config.color, 0.18));
     scene.add(glow);
-    const halo = new THREE.Mesh(new THREE.SphereGeometry(1.55, 48, 32), makeGlowMaterial(config.color, 0.05));
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(1.55, quality.sphereSegments, Math.max(20, Math.round(quality.sphereSegments * 2 / 3))), makeGlowMaterial(config.color, 0.05));
     scene.add(halo);
     const texture = new THREE.TextureLoader().load('/nasa/sun-photosphere-texture.png', loaded => {
       if (disposed) {
@@ -353,14 +374,14 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
       starMaterial.map = loaded;
       starMaterial.needsUpdate = true;
     });
-    const birthCloud = scenario === 'formation' ? makeBirthCloud(sprite) : null;
+    const birthCloud = scenario === 'formation' ? makeBirthCloud(sprite, quality.birthParticles) : null;
     if (birthCloud) scene.add(birthCloud.points);
     const cloudSprite = scenario === 'supernova' ? makeNebulaSprite() : null;
-    const ejecta = scenario === 'supernova' ? makeEjecta(sprite, { count: 2100, size: 0.085, opacity: 0 }) : null;
-    const gasCloud = scenario === 'supernova' ? makeEjecta(cloudSprite, { seed: 9043, count: 540, size: 1.08, opacity: 0 }) : null;
+    const ejecta = scenario === 'supernova' ? makeEjecta(sprite, { count: quality.supernovaParticles, size: 0.085, opacity: 0 }) : null;
+    const gasCloud = scenario === 'supernova' ? makeEjecta(cloudSprite, { seed: 9043, count: quality.gasParticles, size: 1.08, opacity: 0 }) : null;
     if (ejecta) scene.add(ejecta.points);
     if (gasCloud) scene.add(gasCloud.points);
-    const shockwave = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), makeGlowMaterial('#ffac78', 0));
+    const shockwave = new THREE.Mesh(new THREE.SphereGeometry(1, quality.sphereSegments, Math.max(20, Math.round(quality.sphereSegments * 2 / 3))), makeGlowMaterial('#ffac78', 0));
     if (scenario === 'supernova') scene.add(shockwave);
 
     const resize = () => {
@@ -477,6 +498,10 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
 
     const render = time => {
       if (disposed) return;
+      if (lastFrame && time - lastFrame < 1000 / quality.maxFps) {
+        animationFrame = window.requestAnimationFrame(render);
+        return;
+      }
       const delta = lastFrame ? Math.min((time - lastFrame) / 1000, 0.05) : 0;
       lastFrame = time;
       if (runningRef.current) {
