@@ -296,6 +296,7 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
   const runningRef = useRef(false);
   const [phase, setPhase] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [renderMode, setRenderMode] = useState('3d');
   const title = scenario === 'formation'
     ? { fr: 'Naissance d’une étoile semblable au Soleil', ht: 'Nesans yon etwal tankou Solèy la' }[locale]
     : { fr: 'Explosion d’une étoile massive', ht: 'Eksplozyon yon gwo etwal' }[locale];
@@ -322,11 +323,165 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
     try {
       renderer = new THREE.WebGLRenderer({ antialias: quality.antialias, alpha: true, stencil: false, powerPreference: 'low-power' });
     } catch {
-      const fallback = document.createElement('p');
-      fallback.className = 'deep-sky-simulation-error';
-      fallback.textContent = locale === 'fr' ? 'La simulation 3D ne peut pas démarrer sur ce navigateur.' : 'Similasyon 3D a pa ka demare nan navigatè sa a.';
-      mount.appendChild(fallback);
-      return undefined;
+      // Some mobile browsers deny WebGL2 context creation (GPU policy, context limits,
+      // or device support). Keep the lesson playable with a lightweight 2D canvas.
+      const canvas = document.createElement('canvas');
+      canvas.className = 'deep-sky-simulation-canvas deep-sky-simulation-canvas-fallback';
+      canvas.setAttribute('aria-label', title);
+      canvas.tabIndex = 0;
+      const context = canvas.getContext('2d', { alpha: true, desynchronized: true });
+      if (!context) {
+        const fallback = document.createElement('p');
+        fallback.className = 'deep-sky-simulation-error';
+        fallback.textContent = locale === 'fr' ? 'Ce navigateur ne peut pas afficher cette animation.' : 'Navigatè sa a pa ka montre animasyon sa a.';
+        mount.appendChild(fallback);
+        return undefined;
+      }
+      mount.appendChild(canvas);
+      setRenderMode('2d');
+      let disposed = false;
+      let frame = 0;
+      let lastFrame = 0;
+      let rotation = 0;
+      let zoom = 1;
+      let pointerDown = false;
+      const activePointers = new Map();
+      let pinchDistance = 0;
+      let width = 1;
+      let height = 1;
+      const random = makeSeededRandom(scenario === 'formation' ? 9401 : 7403);
+      const particles = Array.from({ length: scenario === 'formation' ? 520 : 260 }, () => {
+        const angle = random() * Math.PI * 2;
+        const radius = Math.sqrt(random()) * (scenario === 'formation' ? 0.47 : 0.12);
+        return { angle, radius, depth: random() * 2 - 1, size: 0.5 + random() * 1.5, phase: random(), color: ['#ffc76f', '#f39b76', '#bd9bd8', '#83baff', '#f8dfb0'][Math.floor(random() * 5)] };
+      });
+      const resizeCanvas = () => {
+        const rect = mount.getBoundingClientRect();
+        const ratio = Math.min(window.devicePixelRatio || 1, 1.25);
+        width = Math.max(1, rect.width);
+        height = Math.max(1, rect.height);
+        canvas.width = Math.round(width * ratio);
+        canvas.height = Math.round(height * ratio);
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      };
+      const resizeObserverFallback = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resizeCanvas);
+      resizeObserverFallback?.observe(mount);
+      if (!resizeObserverFallback) window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      const pointerStart = event => {
+        activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        pointerDown = true;
+        if (activePointers.size === 2) {
+          const points = [...activePointers.values()];
+          pinchDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+        }
+        canvas.setPointerCapture?.(event.pointerId);
+      };
+      const pointerMove = event => {
+        if (!pointerDown) return;
+        const previous = activePointers.get(event.pointerId);
+        if (!previous) return;
+        activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (activePointers.size >= 2) {
+          const points = [...activePointers.values()];
+          const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+          if (pinchDistance > 0 && distance > 0) zoom = THREE.MathUtils.clamp(zoom * distance / pinchDistance, 0.7, 2.4);
+          pinchDistance = distance;
+        } else {
+          rotation += (event.clientX - previous.x) * 0.008;
+        }
+      };
+      const pointerEnd = event => {
+        activePointers.delete(event.pointerId);
+        if (activePointers.size < 2) pinchDistance = 0;
+        if (activePointers.size === 0) pointerDown = false;
+      };
+      const wheel = event => { event.preventDefault(); zoom = THREE.MathUtils.clamp(zoom * Math.exp(-event.deltaY * 0.001), 0.7, 2.4); };
+      canvas.addEventListener('pointerdown', pointerStart);
+      canvas.addEventListener('pointermove', pointerMove);
+      canvas.addEventListener('pointerup', pointerEnd);
+      canvas.addEventListener('pointercancel', pointerEnd);
+      canvas.addEventListener('wheel', wheel, { passive: false });
+      const draw = time => {
+        if (disposed) return;
+        frame = window.requestAnimationFrame(draw);
+        if (lastFrame && time - lastFrame < 1000 / 24) return;
+        const delta = lastFrame ? Math.min((time - lastFrame) / 1000, 0.05) : 0;
+        lastFrame = time;
+        if (runningRef.current) {
+          phaseRef.current = Math.min(1, phaseRef.current + delta / config.duration);
+          if (phaseRef.current >= 1) { runningRef.current = false; setPlaying(false); }
+        }
+        const progress = phaseRef.current;
+        const cx = width / 2;
+        const cy = height / 2;
+        const scale = Math.min(width, height) * zoom;
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = '#070d19';
+        context.fillRect(0, 0, width, height);
+        for (let index = 0; index < 100; index += 1) {
+          const x = ((index * 127.1) % width);
+          const y = ((index * 311.7) % height);
+          context.fillStyle = `rgba(210,225,255,${0.18 + (index % 4) * 0.12})`;
+          context.fillRect(x, y, index % 11 === 0 ? 1.4 : 0.8, index % 11 === 0 ? 1.4 : 0.8);
+        }
+        if (scenario === 'formation') {
+          const collapse = 1 - smoothstep(progress, 0.08, 0.62) * 0.58;
+          particles.forEach(particle => {
+            const inward = smoothstep(progress, 0.12 + particle.phase * 0.18, 0.68);
+            const radius = (particle.radius * (1 - inward * 0.78) + 0.055 * inward) * scale * collapse;
+            const angle = particle.angle + rotation + time * (0.00012 + particle.depth * 0.000035);
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius * (0.58 + Math.abs(particle.depth) * 0.34);
+            context.globalAlpha = 0.38 + (1 - inward) * 0.5;
+            context.fillStyle = particle.color;
+            context.beginPath();
+            context.arc(x, y, particle.size * (width < 500 ? 0.9 : 1.15), 0, Math.PI * 2);
+            context.fill();
+          });
+          context.globalAlpha = 1;
+          const starRadius = scale * (0.035 + smoothstep(progress, 0.38, 0.84) * 0.045);
+          const glow = context.createRadialGradient(cx, cy, starRadius * 0.2, cx, cy, starRadius * 2.8);
+          glow.addColorStop(0, '#fff7dc'); glow.addColorStop(0.22, '#ffc66d'); glow.addColorStop(1, 'rgba(255,137,52,0)');
+          context.fillStyle = glow; context.beginPath(); context.arc(cx, cy, starRadius * 2.8, 0, Math.PI * 2); context.fill();
+          context.fillStyle = '#fff0c2'; context.beginPath(); context.arc(cx, cy, starRadius, 0, Math.PI * 2); context.fill();
+        } else {
+          const blast = smoothstep(progress, 0.25, 0.63);
+          const settling = smoothstep(progress, 0.72, 1);
+          particles.forEach(particle => {
+            const radius = scale * (0.025 + particle.radius * blast * 1.65);
+            const angle = particle.angle + rotation + particle.depth * 0.2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius * (0.6 + Math.abs(particle.depth) * 0.35);
+            context.globalAlpha = 0.7 * (1 - settling * 0.55);
+            context.fillStyle = particle.color;
+            context.beginPath(); context.arc(x, y, particle.size * (1 + blast), 0, Math.PI * 2); context.fill();
+          });
+          context.globalAlpha = 1;
+          const starRadius = scale * (0.045 * (1 - blast * 0.7));
+          const glow = context.createRadialGradient(cx, cy, starRadius * 0.1, cx, cy, starRadius * (1 + blast * 4));
+          glow.addColorStop(0, '#fff'); glow.addColorStop(0.15, '#b6dcff'); glow.addColorStop(0.42, 'rgba(91,157,255,0.6)'); glow.addColorStop(1, 'rgba(91,157,255,0)');
+          context.fillStyle = glow; context.beginPath(); context.arc(cx, cy, starRadius * (1 + blast * 4), 0, Math.PI * 2); context.fill();
+          context.fillStyle = '#d8edff'; context.beginPath(); context.arc(cx, cy, starRadius, 0, Math.PI * 2); context.fill();
+        }
+        if (time - (canvas.dataset.lastUiUpdate || 0) > 140 || progress >= 1) {
+          canvas.dataset.lastUiUpdate = time;
+          setPhase(progress);
+        }
+      };
+      frame = window.requestAnimationFrame(draw);
+      return () => {
+        disposed = true;
+        window.cancelAnimationFrame(frame);
+        resizeObserverFallback?.disconnect();
+        if (!resizeObserverFallback) window.removeEventListener('resize', resizeCanvas);
+        canvas.removeEventListener('pointerdown', pointerStart);
+        canvas.removeEventListener('pointermove', pointerMove);
+        canvas.removeEventListener('pointerup', pointerEnd);
+        canvas.removeEventListener('pointercancel', pointerEnd);
+        canvas.removeEventListener('wheel', wheel);
+        canvas.remove();
+      };
     }
 
     let disposed = false;
@@ -579,7 +734,7 @@ export default function DeepSkySimulation({ scenario, locale = 'fr' }) {
 
   return <section id={'deep-sky-simulation-' + scenario} className={'deep-sky-simulation-card ' + scenario} aria-label={title}>
     <header className="deep-sky-simulation-heading">
-      <div><span className="deep-sky-simulation-tag">{locale === 'fr' ? 'SIMULATION 3D MANIPULABLE' : 'SIMILASYON 3D OU KA MANYEN'}</span><h3>{title}</h3><p>{description}</p></div>
+      <div><span className="deep-sky-simulation-tag">{renderMode === '3d' ? (locale === 'fr' ? 'SIMULATION 3D MANIPULABLE' : 'SIMILASYON 3D OU KA MANYEN') : (locale === 'fr' ? 'ANIMATION LÉGÈRE POUR CE NAVIGATEUR' : 'ANIMASYON LEJE POU NAVIGATÈ SA A')}</span><h3>{title}</h3><p>{description}</p></div>
       <span className="deep-sky-simulation-duration">{scenario === 'formation' ? (locale === 'fr' ? '≈ 2 min' : '≈ 2 min') : (locale === 'fr' ? '≈ 36 s' : '≈ 36 s')}</span>
     </header>
     <div className="deep-sky-simulation-viewport">
